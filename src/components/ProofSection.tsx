@@ -66,29 +66,32 @@ export default function ProofSection() {
           </p>
         </Reveal>
 
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {/* Masonry — each screenshot at its real aspect ratio, framed
+            like a browser window. No forced crop, no letterboxing. */}
+        <div className="mt-8 columns-2 gap-4 sm:columns-3 lg:columns-4">
           {proofItems.map((item, i) => (
             <Reveal
               key={item.src}
-              delay={(i % 4) * 0.08}
-              className={item.wide ? "col-span-2" : undefined}
+              delay={Math.min((i % 6) * 0.06, 0.36)}
+              className="mb-4 break-inside-avoid"
             >
-              <figure className="group relative overflow-hidden border border-border bg-surface transition-colors hover:border-accent-dim">
-                <div
-                  className={`relative w-full ${
-                    item.wide ? "aspect-[21/8]" : "aspect-[3/4]"
-                  }`}
-                >
-                  <Image
-                    src={item.src}
-                    alt={item.alt}
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    className="object-contain transition-transform duration-500 group-hover:scale-105"
-                  />
+              <figure className="group overflow-hidden rounded-lg border border-border bg-[#e8e6e0] transition-colors hover:border-accent-dim">
+                {/* browser chrome */}
+                <div className="flex items-center gap-1.5 border-b border-black/10 bg-[#dedbd3] px-3 py-2">
+                  <span className="h-2 w-2 rounded-full bg-black/20" />
+                  <span className="h-2 w-2 rounded-full bg-black/20" />
+                  <span className="h-2 w-2 rounded-full bg-black/20" />
                 </div>
-                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/80 to-transparent p-3">
-                  <span className="block font-display text-lg font-bold text-accent-light">
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  width={item.width}
+                  height={item.height}
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className="h-auto w-full transition-transform duration-500 group-hover:scale-[1.03]"
+                />
+                <figcaption className="border-t border-border bg-black px-3 py-2.5">
+                  <span className="block font-display text-base font-bold text-accent-light">
                     {item.stat}
                   </span>
                   <span className="block text-[11px] text-text-muted">

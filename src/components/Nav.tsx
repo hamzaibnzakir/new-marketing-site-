@@ -13,7 +13,7 @@ export default function Nav() {
 
         <Link
           href="/apply"
-          className="border border-accent-2-light bg-accent-2 px-5 py-2.5 font-display text-sm font-semibold tracking-wide text-white transition-colors hover:bg-accent-2-light"
+          className="border border-accent-2-light bg-accent-2 px-5 py-3 font-display text-sm font-semibold tracking-wide text-white transition-colors hover:bg-accent-2-light"
         >
           Apply Now
         </Link>

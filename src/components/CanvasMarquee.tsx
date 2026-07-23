@@ -8,8 +8,8 @@ interface LoadedTile {
   item: ProofItem;
 }
 
-const TILE_W = 200;
-const TILE_H = 260;
+const TILE_W = 220;
+const TILE_H = 300;
 const GAP = 16;
 const SPEED = 32; // px per second
 
@@ -73,50 +73,58 @@ export default function CanvasMarquee({ items }: { items: ProofItem[] }) {
 
       const setW = loaded.length * (TILE_W + GAP);
 
+      const CHROME_H = 20;
+      const CAPTION_H = 52;
+      const IMG_ZONE_H = TILE_H - CHROME_H - CAPTION_H;
+
       const drawTile = (tile: LoadedTile, x: number) => {
         if (x + TILE_W < -50 || x > w + 50) return; // cull off-screen
 
+        const top = 16;
+
         ctx.save();
-        // rounded-rect clip
+        // rounded-rect clip for the whole card
         const r = 8;
         ctx.beginPath();
-        ctx.moveTo(x + r, 16);
-        ctx.arcTo(x + TILE_W, 16, x + TILE_W, 16 + r, r);
-        ctx.arcTo(x + TILE_W, 16 + TILE_H, x + TILE_W - r, 16 + TILE_H, r);
-        ctx.arcTo(x, 16 + TILE_H, x, 16 + TILE_H - r, r);
-        ctx.arcTo(x, 16, x + r, 16, r);
+        ctx.moveTo(x + r, top);
+        ctx.arcTo(x + TILE_W, top, x + TILE_W, top + r, r);
+        ctx.arcTo(x + TILE_W, top + TILE_H, x + TILE_W - r, top + TILE_H, r);
+        ctx.arcTo(x, top + TILE_H, x, top + TILE_H - r, r);
+        ctx.arcTo(x, top, x + r, top, r);
         ctx.closePath();
         ctx.clip();
 
-        // background
-        ctx.fillStyle = "#0d0d0d";
-        ctx.fillRect(x, 16, TILE_W, TILE_H);
+        // browser chrome strip
+        ctx.fillStyle = "#dedbd3";
+        ctx.fillRect(x, top, TILE_W, CHROME_H);
+        ctx.fillStyle = "rgba(0,0,0,0.22)";
+        for (let d = 0; d < 3; d++) {
+          ctx.beginPath();
+          ctx.arc(x + 10 + d * 12, top + CHROME_H / 2, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
 
-        // image, contain-fit (never crop real numbers)
+        // image zone — light background, contain-fit (never crop numbers)
+        ctx.fillStyle = "#e8e6e0";
+        ctx.fillRect(x, top + CHROME_H, TILE_W, IMG_ZONE_H);
         if (tile.img.complete && tile.img.naturalWidth > 0) {
           const iw = tile.img.naturalWidth;
           const ih = tile.img.naturalHeight;
-          const scale = Math.min(TILE_W / iw, (TILE_H - 50) / ih);
+          const scale = Math.min(TILE_W / iw, IMG_ZONE_H / ih);
           const dw = iw * scale;
           const dh = ih * scale;
           const dx = x + (TILE_W - dw) / 2;
-          const dy = 16 + (TILE_H - 50 - dh) / 2 + 10;
+          const dy = top + CHROME_H + (IMG_ZONE_H - dh) / 2;
           ctx.drawImage(tile.img, dx, dy, dw, dh);
         }
 
-        // bottom gradient
-        const grad = ctx.createLinearGradient(
-          0,
-          16 + TILE_H - 60,
-          0,
-          16 + TILE_H
-        );
-        grad.addColorStop(0, "rgba(0,0,0,0)");
-        grad.addColorStop(1, "rgba(0,0,0,0.92)");
-        ctx.fillStyle = grad;
-        ctx.fillRect(x, 16 + TILE_H - 60, TILE_W, 60);
+        // caption zone — solid black, separate from image (no overlay
+        // muddying light dashboard screenshots)
+        const capY = top + CHROME_H + IMG_ZONE_H;
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(x, capY, TILE_W, CAPTION_H);
 
-        // border
+        // card border
         ctx.strokeStyle = "rgba(255,255,255,0.08)";
         ctx.lineWidth = 1;
         ctx.stroke();
@@ -124,14 +132,14 @@ export default function CanvasMarquee({ items }: { items: ProofItem[] }) {
 
         // stat text
         ctx.fillStyle = "#2ecc8f";
-        ctx.font = `700 18px ${displayFont}`;
+        ctx.font = `700 16px ${displayFont}`;
         ctx.textBaseline = "alphabetic";
-        ctx.fillText(tile.item.stat, x + 12, 16 + TILE_H - 30);
+        ctx.fillText(tile.item.stat, x + 12, capY + 22);
 
         // label text
         ctx.fillStyle = "#8a8780";
         ctx.font = `400 10px ${bodyFont}`;
-        ctx.fillText(tile.item.label, x + 12, 16 + TILE_H - 14, TILE_W - 24);
+        ctx.fillText(tile.item.label, x + 12, capY + 38, TILE_W - 24);
       };
 
       let last = performance.now();
