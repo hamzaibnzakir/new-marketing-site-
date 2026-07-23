@@ -1,4 +1,5 @@
 import Reveal from "./Reveal";
+import FAQItem from "./FAQItem";
 
 const faqs = [
   {
@@ -62,17 +63,7 @@ export default function FAQSection() {
       <div className="mt-12 divide-y divide-border border-t border-border">
         {faqs.map((f, i) => (
           <Reveal key={f.q} delay={Math.min(i * 0.06, 0.3)}>
-            <details className="group py-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between font-display text-base font-semibold marker:content-none">
-                {f.q}
-                <span className="ml-4 shrink-0 text-accent-light transition-transform group-open:rotate-45">
-                  +
-                </span>
-              </summary>
-              <p className="mt-3 pr-8 text-sm leading-relaxed text-text-muted">
-                {f.a}
-              </p>
-            </details>
+            <FAQItem q={f.q} a={f.a} />
           </Reveal>
         ))}
       </div>
