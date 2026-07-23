@@ -108,3 +108,43 @@ body {
 .has-custom-cursor summary {
   cursor: none;
 }
+
+/* Legal page content — hand-styled to match the design system rather
+   than a generic typography plugin. */
+.legal-content h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+.legal-content h2:first-child {
+  margin-top: 0;
+}
+.legal-content p {
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  margin-bottom: 1rem;
+}
+.legal-content ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  margin-bottom: 1rem;
+}
+.legal-content li {
+  margin-bottom: 0.4rem;
+}
+.legal-content strong {
+  color: var(--text);
+  font-weight: 600;
+}
+.legal-content a {
+  color: var(--accent-light);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
