@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+/*
+  Design tokens — single source of truth for the design system.
+  --accent is a PLACEHOLDER (current site's gold) until final color is
+  confirmed. Everything references this token, so the whole site
+  re-themes from one change here — no hunting through components.
+*/
+:root {
+  --black: #050505;
+  --surface: #0d0d0d;
+  --surface-2: #141414;
+  --text: #f0ede6;
+  --text-muted: #8a8780;
+  --border: rgba(255, 255, 255, 0.08);
+
+  /* LOCKED — primary accent: emerald. Used everywhere: headings,
+     links, icons, borders, glows. */
+  --accent: #0f5c3f;
+  --accent-light: #2ecc8f;
+  --accent-dim: #0a3d2a;
+
+  /* LOCKED — secondary accent: crimson. Used ONLY for the Apply CTA
+     and urgency badges — deliberately rare, never mixed in freely
+     with emerald elsewhere on the page. */
+  --accent-2: #8c1d2e;
+  --accent-2-light: #d63a4f;
+}
+
+@theme inline {
+  --color-black: var(--black);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-accent-dim: var(--accent-dim);
+  --color-accent-2: var(--accent-2);
+  --color-accent-2-light: var(--accent-2-light);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: var(--font-body), sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--black);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent-dim);
+  border-radius: 2px;
+}
