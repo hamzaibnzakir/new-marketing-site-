@@ -4,10 +4,26 @@ import CanvasMarquee from "./CanvasMarquee";
 import { proofItems } from "@/lib/proof";
 
 const videos = [
-  { src: "/kelvin.mp4", label: "Kelvin — started with zero experience" },
-  { src: "/video.mp4", label: "Student store walkthrough" },
-  { src: "/lv_0_20250220054830.mp4", label: "Live scaling session" },
-  { src: "/VID-20250222-WA0003.mp4", label: "Behind the scenes" },
+  {
+    src: "/kelvin.mp4",
+    poster: "/posters/kelvin.jpg",
+    label: "Kelvin — started with zero experience",
+  },
+  {
+    src: "/video.mp4",
+    poster: "/posters/video.jpg",
+    label: "Student store walkthrough",
+  },
+  {
+    src: "/lv_0_20250220054830.mp4",
+    poster: "/posters/lv_0_20250220054830.jpg",
+    label: "Live scaling session",
+  },
+  {
+    src: "/VID-20250222-WA0003.mp4",
+    poster: "/posters/VID-20250222-WA0003.jpg",
+    label: "Behind the scenes",
+  },
 ];
 
 export default function ProofSection() {
@@ -46,6 +62,7 @@ export default function ProofSection() {
               <div className="group border border-border transition-colors hover:border-accent-dim">
                 <video
                   src={v.src}
+                  poster={v.poster}
                   controls
                   preload="none"
                   playsInline
