@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Reveal from "./Reveal";
+import BorderBeam from "./BorderBeam";
 
 export default function FinalCTA() {
   return (
@@ -15,12 +16,14 @@ export default function FinalCTA() {
           Apply now and we&apos;ll walk through your goals, your budget, and
           exactly how the mentorship works for your situation.
         </p>
-        <Link
-          href="/apply"
-          className="mt-10 inline-block border border-accent-2-light bg-accent-2 px-10 py-4 font-display text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-accent-2-light"
-        >
-          Apply for Mentorship
-        </Link>
+        <BorderBeam className="mx-auto mt-10 inline-block">
+          <Link
+            href="/apply"
+            className="block bg-accent-2 px-10 py-4 font-display text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-accent-2-light"
+          >
+            Apply for Mentorship
+          </Link>
+        </BorderBeam>
       </Reveal>
     </section>
   );

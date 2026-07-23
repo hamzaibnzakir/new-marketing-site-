@@ -1,4 +1,5 @@
 import Reveal from "./Reveal";
+import TiltCard from "./TiltCard";
 
 const testimonials = [
   {
@@ -36,17 +37,21 @@ export default function Testimonials() {
       <div className="mt-14 grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8">
         {testimonials.map((t, i) => (
           <Reveal key={t.name} delay={i * 0.12}>
-            <blockquote className="border-l-2 border-accent-dim pl-6">
-              <p className="text-sm leading-relaxed text-text">
-                &ldquo;{t.quote}&rdquo;
-              </p>
-              <footer className="mt-4">
-                <span className="font-display text-sm font-semibold text-accent-light">
-                  {t.name}
-                </span>
-                <span className="block text-xs text-text-muted">{t.tag}</span>
-              </footer>
-            </blockquote>
+            <TiltCard>
+              <blockquote className="border border-border bg-surface p-6">
+                <p className="text-sm leading-relaxed text-text">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <footer className="mt-4 border-t border-border pt-4">
+                  <span className="font-display text-sm font-semibold text-accent-light">
+                    {t.name}
+                  </span>
+                  <span className="block text-xs text-text-muted">
+                    {t.tag}
+                  </span>
+                </footer>
+              </blockquote>
+            </TiltCard>
           </Reveal>
         ))}
       </div>

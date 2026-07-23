@@ -66,3 +66,45 @@ body {
   background: var(--accent-dim);
   border-radius: 2px;
 }
+
+/* Border beam — rotating conic-gradient chasing around an element's
+   edge. @property lets the browser interpolate the angle smoothly
+   instead of snapping between keyframes. */
+@property --beam-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.border-beam {
+  --beam-angle: 0deg;
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0%,
+    var(--accent-2-light) 8%,
+    var(--accent-light) 16%,
+    transparent 28%,
+    transparent 100%
+  );
+  animation: beam-rotate 3.5s linear infinite;
+}
+
+@keyframes beam-rotate {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .border-beam {
+    animation: none;
+    background: var(--accent-dim);
+  }
+}
+
+.has-custom-cursor,
+.has-custom-cursor a,
+.has-custom-cursor button,
+.has-custom-cursor summary {
+  cursor: none;
+}
