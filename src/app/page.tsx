@@ -3,7 +3,6 @@ import Hero from "@/components/Hero";
 import ProofSection from "@/components/ProofSection";
 import PivotStatement from "@/components/PivotStatement";
 import SystemSection from "@/components/SystemSection";
-import DashboardWalkthrough from "@/components/DashboardWalkthrough";
 import BentoFeatures from "@/components/BentoFeatures";
 import Testimonials from "@/components/Testimonials";
 import FAQSection from "@/components/FAQSection";
@@ -19,7 +18,6 @@ export default function Home() {
         <ProofSection />
         <PivotStatement />
         <SystemSection />
-        <DashboardWalkthrough />
         <BentoFeatures />
         <Testimonials />
         <FAQSection />
