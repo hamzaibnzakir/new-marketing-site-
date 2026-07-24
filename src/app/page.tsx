@@ -5,6 +5,7 @@ import PivotStatement from "@/components/PivotStatement";
 import SystemSection from "@/components/SystemSection";
 import BentoFeatures from "@/components/BentoFeatures";
 import Testimonials from "@/components/Testimonials";
+import AIToolsSection from "@/components/AIToolsSection";
 import FAQSection from "@/components/FAQSection";
 import FinalCTA from "@/components/FinalCTA";
 import Footer from "@/components/Footer";
@@ -20,6 +21,7 @@ export default function Home() {
         <SystemSection />
         <BentoFeatures />
         <Testimonials />
+        <AIToolsSection />
         <FAQSection />
         <FinalCTA />
       </main>
