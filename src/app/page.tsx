@@ -6,6 +6,7 @@ import SystemSection from "@/components/SystemSection";
 import BentoFeatures from "@/components/BentoFeatures";
 import Testimonials from "@/components/Testimonials";
 import AIToolsSection from "@/components/AIToolsSection";
+import ExpertServicesSection from "@/components/ExpertServicesSection";
 import FAQSection from "@/components/FAQSection";
 import FinalCTA from "@/components/FinalCTA";
 import Footer from "@/components/Footer";
@@ -22,6 +23,7 @@ export default function Home() {
         <BentoFeatures />
         <Testimonials />
         <AIToolsSection />
+        <ExpertServicesSection />
         <FAQSection />
         <FinalCTA />
       </main>
