@@ -42,30 +42,39 @@ export default function SystemSection() {
 
     const mm = gsap.matchMedia();
 
-    // Pinned horizontal scroll only on wider viewports — on mobile the
-    // cards just stack normally (pinning a horizontal scroll on a phone
-    // is exactly the kind of "pretty but dysfunctional" UX the vibe-coded
-    // checklist warns against).
-    mm.add("(min-width: 768px)", () => {
-      const scrollDistance = track.scrollWidth - section.clientWidth;
+    // Pinned horizontal scroll only where it makes sense:
+    //  - md and up (on phones the cards just stack),
+    //  - below ~1890px, because above that all three cards already fit
+    //    on screen and pinning would only add dead scrolling,
+    //  - and only if the visitor hasn't asked for reduced motion (they
+    //    get the cards stacked instead — see the motion-reduce classes).
+    mm.add(
+      "(min-width: 768px) and (max-width: 1889px) and (prefers-reduced-motion: no-preference)",
+      () => {
+        // Measured fresh on every ScrollTrigger refresh (resize, fonts
+        // loading, orientation change) rather than once at setup.
+        const distance = () =>
+          Math.max(0, track.scrollWidth - section.clientWidth);
 
-      const ctx = gsap.context(() => {
-        gsap.to(track, {
-          x: -scrollDistance,
-          ease: "none",
-          scrollTrigger: {
-            trigger: section,
-            start: "top top",
-            end: () => `+=${scrollDistance + window.innerHeight * 0.3}`,
-            scrub: 0.6,
-            pin: true,
-            anticipatePin: 1,
-          },
-        });
-      }, section);
+        const ctx = gsap.context(() => {
+          gsap.to(track, {
+            x: () => -distance(),
+            ease: "none",
+            scrollTrigger: {
+              trigger: section,
+              start: "top top",
+              end: () => `+=${distance() + window.innerHeight * 0.3}`,
+              scrub: 0.6,
+              pin: true,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+            },
+          });
+        }, section);
 
-      return () => ctx.revert();
-    });
+        return () => ctx.revert();
+      }
+    );
 
     return () => mm.revert();
   }, []);
@@ -73,7 +82,7 @@ export default function SystemSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden py-24 md:py-0"
+      className="relative overflow-hidden py-24 md:py-0 motion-reduce:md:py-24"
     >
       <div className="mx-auto max-w-6xl px-6 md:pt-32">
         <Reveal>
@@ -88,7 +97,7 @@ export default function SystemSection() {
 
       <div
         ref={trackRef}
-        className="mt-16 flex flex-col gap-12 px-6 md:mt-20 md:h-[50vh] md:flex-row md:items-center md:gap-24 md:px-[10vw]"
+        className="mt-16 flex flex-col gap-12 px-6 md:mt-20 md:h-[50vh] md:flex-row md:items-center md:gap-24 md:px-[10vw] min-[1890px]:justify-center motion-reduce:md:h-auto motion-reduce:md:flex-col motion-reduce:md:items-start"
       >
         {phases.map((p) => (
           <div key={p.n} className="md:w-[440px] md:shrink-0">

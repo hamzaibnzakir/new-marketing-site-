@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { APPLY_URL } from "@/lib/links";
 export default function Footer() {
   return (
     <footer className="border-t border-border px-6 py-10">
@@ -9,7 +10,7 @@ export default function Footer() {
         </span>
 
         <nav className="flex flex-wrap items-center justify-center gap-6">
-          <Link href="/apply" className="hover:text-accent-light">
+          <Link href={APPLY_URL} className="hover:text-accent-light">
             Apply
           </Link>
           <Link href="/contact" className="hover:text-accent-light">

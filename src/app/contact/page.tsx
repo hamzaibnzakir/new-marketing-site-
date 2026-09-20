@@ -4,6 +4,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import BorderBeam from "@/components/BorderBeam";
 
+import { APPLY_URL } from "@/lib/links";
 export const metadata: Metadata = {
   title: "Contact",
   description: "Get in touch with BrainBox Ecom Lab.",
@@ -28,7 +29,7 @@ export default function ContactPage() {
         </p>
         <BorderBeam className="mt-8 inline-block">
           <Link
-            href="/apply"
+            href={APPLY_URL}
             className="block bg-accent-2 px-8 py-4 font-display text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-accent-2-light"
           >
             Apply for Mentorship

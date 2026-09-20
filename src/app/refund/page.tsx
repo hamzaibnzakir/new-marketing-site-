@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import LegalLayout from "@/components/LegalLayout";
 
 export const metadata: Metadata = {
@@ -56,7 +57,7 @@ export default function RefundPage() {
       <h2>4. How to Request a Refund</h2>
       <p>
         To request a refund, contact us through the{" "}
-        <a href="/contact">contact page</a> with your name, the email used
+        <Link href="/contact">contact page</Link> with your name, the email used
         at enrollment, and the reason for your request. We aim to respond
         to all refund requests within 5 business days.
       </p>
@@ -68,7 +69,7 @@ export default function RefundPage() {
         factors outside BrainBox&apos;s control, including your own
         execution, market conditions, and third-party platform behavior.
         This is addressed in full in our{" "}
-        <a href="/terms">Terms of Service</a>.
+        <Link href="/terms">Terms of Service</Link>.
       </p>
 
       <h2>6. Chargebacks</h2>
@@ -98,7 +99,7 @@ export default function RefundPage() {
       <h2>9. Contact</h2>
       <p>
         Questions about this policy can be directed to us via the{" "}
-        <a href="/contact">contact page</a>.
+        <Link href="/contact">contact page</Link>.
       </p>
     </LegalLayout>
   );

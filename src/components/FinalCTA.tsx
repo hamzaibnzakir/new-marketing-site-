@@ -2,6 +2,7 @@ import Link from "next/link";
 import Reveal from "./Reveal";
 import BorderBeam from "./BorderBeam";
 
+import { APPLY_URL } from "@/lib/links";
 export default function FinalCTA() {
   return (
     <section className="border-t border-border px-6 py-28 text-center md:py-36">
@@ -18,7 +19,7 @@ export default function FinalCTA() {
         </p>
         <BorderBeam className="mx-auto mt-10 inline-block">
           <Link
-            href="/apply"
+            href={APPLY_URL}
             className="block bg-accent-2 px-10 py-4 font-display text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-accent-2-light"
           >
             Apply for Mentorship

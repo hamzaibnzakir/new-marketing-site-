@@ -16,6 +16,7 @@ export default function MagneticButton({ children }: { children: ReactNode }) {
     const wrap = wrapRef.current;
     if (!wrap) return;
     if (window.matchMedia("(pointer: coarse)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const moveX = gsap.quickTo(wrap, "x", { duration: 0.5, ease: "power3.out" });
     const moveY = gsap.quickTo(wrap, "y", { duration: 0.5, ease: "power3.out" });
@@ -25,8 +26,13 @@ export default function MagneticButton({ children }: { children: ReactNode }) {
 
     const handleMove = (e: PointerEvent) => {
       const rect = wrap.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
+      // getBoundingClientRect includes the button's current pull, so
+      // subtract it to get the true resting center. Without this the
+      // distance shrinks as the button moves, causing jitter/feedback.
+      const offsetX = gsap.getProperty(wrap, "x") as number;
+      const offsetY = gsap.getProperty(wrap, "y") as number;
+      const cx = rect.left + rect.width / 2 - offsetX;
+      const cy = rect.top + rect.height / 2 - offsetY;
       const dx = e.clientX - cx;
       const dy = e.clientY - cy;
       const dist = Math.hypot(dx, dy);

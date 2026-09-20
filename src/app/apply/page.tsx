@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
+import { APPLY_URL } from "@/lib/links";
 
-// Placeholder: routes to the go.brainboxecomlab.com funnel once that
-// subdomain is built. Update this URL when it's live.
+// Kept so old links, ads, and bookmarks to /apply still land in the
+// funnel. On-site buttons link to APPLY_URL directly (no extra hop).
 export default function ApplyPage() {
-  redirect("https://go.brainboxecomlab.com");
+  redirect(APPLY_URL);
 }

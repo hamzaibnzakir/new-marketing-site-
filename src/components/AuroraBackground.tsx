@@ -3,11 +3,20 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Soft animated glow blobs behind the hero, rendered on canvas for
- * performance (no DOM repaints). Two blobs drift slowly and pulse —
- * emerald + crimson only, matching the locked design tokens. Respects
- * prefers-reduced-motion.
+ * Soft animated glow blobs behind the hero, rendered on canvas so it
+ * doesn't cause DOM repaints. Two blobs drift slowly and pulse —
+ * emerald + crimson only, matching the locked design tokens.
+ *
+ * Performance notes:
+ *  - Renders at half resolution: the blobs are pure soft gradients, so
+ *    the browser upscaling them is invisible but ~4x cheaper.
+ *  - Motion is time-based (same speed on 60Hz and 120Hz screens).
+ *  - Stops entirely while the hero is off-screen.
+ *  - With prefers-reduced-motion it paints one still frame and stops.
  */
+const SCALE = 0.5;
+const FRAME_MS = 16.667; // original tuning was per-frame at 60fps
+
 export default function AuroraBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -22,29 +31,18 @@ export default function AuroraBackground() {
     ).matches;
 
     let raf = 0;
+    let running = false;
     let w = 0;
     let h = 0;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-    const resize = () => {
-      const rect = canvas.getBoundingClientRect();
-      w = rect.width;
-      h = rect.height;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-    resize();
-    window.addEventListener("resize", resize);
+    let t = 0; // in "60fps frames", so the speeds below keep their feel
+    let last = 0;
 
     const blobs = [
       { x: 0.32, y: 0.35, r: 0.38, color: "15, 92, 63", speed: 0.00025 },
       { x: 0.7, y: 0.55, r: 0.3, color: "140, 29, 46", speed: 0.0002 },
     ];
 
-    let t = 0;
-
-    const draw = () => {
+    const render = () => {
       ctx.clearRect(0, 0, w, h);
       for (const b of blobs) {
         const drift = reduceMotion ? 0 : Math.sin(t * b.speed) * 0.04;
@@ -61,14 +59,51 @@ export default function AuroraBackground() {
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, w, h);
       }
-      t += reduceMotion ? 0 : 1;
-      raf = requestAnimationFrame(draw);
     };
-    draw();
+
+    const frame = (now: number) => {
+      if (!running) return;
+      if (last) t += (now - last) / FRAME_MS;
+      last = now;
+      render();
+      raf = requestAnimationFrame(frame);
+    };
+
+    const start = () => {
+      if (running || reduceMotion) return;
+      running = true;
+      last = 0;
+      raf = requestAnimationFrame(frame);
+    };
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(raf);
+    };
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      w = Math.max(1, Math.round(rect.width * SCALE));
+      h = Math.max(1, Math.round(rect.height * SCALE));
+      canvas.width = w;
+      canvas.height = h;
+      render(); // repaint immediately so a resize never flashes blank
+    };
+
+    resize();
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) start();
+      else stop();
+    });
+    io.observe(canvas);
 
     return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
+      stop();
+      ro.disconnect();
+      io.disconnect();
     };
   }, []);
 

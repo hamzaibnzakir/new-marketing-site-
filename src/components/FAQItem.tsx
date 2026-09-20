@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useId } from "react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
 export default function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   const id = useId();
+  const reduce = useReducedMotion();
 
   return (
     <div className="py-5">
@@ -19,7 +20,7 @@ export default function FAQItem({ q, a }: { q: string; a: string }) {
         {q}
         <motion.span
           animate={{ rotate: open ? 45 : 0 }}
-          transition={{ duration: 0.25, ease: "easeOut" }}
+          transition={{ duration: reduce ? 0 : 0.25, ease: "easeOut" }}
           className="ml-4 shrink-0 text-accent-light"
         >
           +
@@ -35,7 +36,7 @@ export default function FAQItem({ q, a }: { q: string; a: string }) {
           height: open ? "auto" : 0,
           opacity: open ? 1 : 0,
         }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: reduce ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
         className="overflow-hidden"
       >
         <p className="mt-3 pr-8 text-sm leading-relaxed text-text-muted">

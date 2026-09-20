@@ -1,28 +1,8 @@
-"use client";
-
-import { motion } from "motion/react";
-
-const container = {
-  hidden: {},
-  show: {
-    transition: { staggerChildren: 0.06, delayChildren: 0.1 },
-  },
-};
-
-const word = {
-  hidden: { opacity: 0, y: 18, filter: "blur(6px)" },
-  show: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
-  },
-};
-
 /**
- * Splits text into words and reveals them sequentially from a masked,
- * blurred state on mount. Real Motion staggerChildren — free/open-source,
- * no Motion+ needed.
+ * Splits text into words and reveals them one after another. Pure CSS
+ * (see `.stagger-word` in globals.css) so it starts on first paint —
+ * not after JS hydrates — and the headline is visible with JS off.
+ * Screen readers get the full sentence via aria-label.
  */
 export default function StaggerHeadline({
   lines,
@@ -31,27 +11,28 @@ export default function StaggerHeadline({
   lines: { text: string; className?: string }[];
   className?: string;
 }) {
+  const label = lines.map((l) => l.text).join(" ");
+  let index = 0;
+
   return (
-    <motion.h1
-      className={className}
-      variants={container}
-      initial="hidden"
-      animate="show"
-    >
+    <h1 className={className} aria-label={label}>
       {lines.map((line, li) => (
-        <span key={li} className={`block ${line.className ?? ""}`}>
+        <span
+          key={li}
+          aria-hidden="true"
+          className={`block ${line.className ?? ""}`}
+        >
           {line.text.split(" ").map((w, wi) => (
-            <motion.span
+            <span
               key={wi}
-              variants={word}
-              className="inline-block"
-              style={{ marginRight: "0.28em" }}
+              className="stagger-word"
+              style={{ "--i": index++ } as React.CSSProperties}
             >
               {w}
-            </motion.span>
+            </span>
           ))}
         </span>
       ))}
-    </motion.h1>
+    </h1>
   );
 }

@@ -29,6 +29,7 @@ export default function CanvasMarquee({ items }: { items: ProofItem[] }) {
     let raf = 0;
     let offset = 0;
     let paused = false;
+    let running = false;
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
@@ -55,6 +56,13 @@ export default function CanvasMarquee({ items }: { items: ProofItem[] }) {
         .getPropertyValue("--font-body")
         .trim() || "sans-serif";
 
+    let startLoop: () => void = () => {};
+    let stopLoop: () => void = () => {};
+    let observer: IntersectionObserver | undefined;
+    let onEnter: ((e: PointerEvent) => void) | undefined;
+    let onLeave: (() => void) | undefined;
+    let onResize: (() => void) | undefined;
+
     Promise.all(
       items.map(
         (item) =>
@@ -69,7 +77,14 @@ export default function CanvasMarquee({ items }: { items: ProofItem[] }) {
       if (cancelled) return;
       setReady(true);
       resize();
-      window.addEventListener("resize", resize);
+      onResize = () => {
+        resize();
+        if (reduceMotion) {
+          running = true;
+          raf = requestAnimationFrame(draw);
+        }
+      };
+      window.addEventListener("resize", onResize);
 
       const setW = loaded.length * (TILE_W + GAP);
 
@@ -144,6 +159,7 @@ export default function CanvasMarquee({ items }: { items: ProofItem[] }) {
 
       let last = performance.now();
       const draw = (now: number) => {
+        if (!running) return;
         const dt = Math.min((now - last) / 1000, 0.05);
         last = now;
         if (!paused && !reduceMotion) offset += SPEED * dt;
@@ -159,26 +175,61 @@ export default function CanvasMarquee({ items }: { items: ProofItem[] }) {
           const tile = loaded[Math.round(idx)];
           if (tile) drawTile(tile, x);
         }
+        if (reduceMotion) {
+          running = false; // static: one frame is enough
+          return;
+        }
         raf = requestAnimationFrame(draw);
       };
-      raf = requestAnimationFrame(draw);
 
-      wrap.addEventListener("pointerenter", () => (paused = true));
-      wrap.addEventListener("pointerleave", () => (paused = false));
+      // Only animate while the marquee is actually on screen.
+      startLoop = () => {
+        if (running) return;
+        running = true;
+        last = performance.now();
+        raf = requestAnimationFrame(draw);
+      };
+      stopLoop = () => {
+        running = false;
+        cancelAnimationFrame(raf);
+      };
+
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) startLoop();
+          else stopLoop();
+        },
+        { rootMargin: "100px" }
+      );
+      observer.observe(wrap);
+
+      // Mouse hover pauses; touch/pen never leaves it stuck paused.
+      onEnter = (e: PointerEvent) => {
+        if (e.pointerType === "mouse") paused = true;
+      };
+      onLeave = () => (paused = false);
+      wrap.addEventListener("pointerenter", onEnter);
+      wrap.addEventListener("pointerleave", onLeave);
     });
 
     return () => {
       cancelled = true;
+      running = false;
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
+      stopLoop();
+      observer?.disconnect();
+      if (onEnter) wrap.removeEventListener("pointerenter", onEnter);
+      if (onLeave) wrap.removeEventListener("pointerleave", onLeave);
+      if (onResize) window.removeEventListener("resize", onResize);
     };
   }, [items]);
 
   return (
-    <div ref={wrapRef} className="relative">
+    <div ref={wrapRef} className="relative" style={{ height: TILE_H + 32 }}>
       <canvas
         ref={canvasRef}
         aria-hidden="true"
+        style={{ height: TILE_H + 32 }}
         className={`block w-full transition-opacity duration-500 ${
           ready ? "opacity-100" : "opacity-0"
         }`}

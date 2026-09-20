@@ -7,6 +7,7 @@ import MagneticButton from "./MagneticButton";
 import StaggerHeadline from "./StaggerHeadline";
 import AnimatedStat from "./AnimatedStat";
 
+import { APPLY_URL } from "@/lib/links";
 export default function Hero() {
   return (
     <section className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-6 pt-20 text-center md:min-h-[92vh]">
@@ -39,7 +40,7 @@ export default function Hero() {
           <MagneticButton>
             <BorderBeam className="mt-10 inline-block">
               <Link
-                href="/apply"
+                href={APPLY_URL}
                 className="block bg-accent-2 px-8 py-4 font-display text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-accent-2-light"
               >
                 Apply for Mentorship

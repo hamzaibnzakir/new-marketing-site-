@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -20,6 +20,13 @@ interface AnimatedStatProps {
   label: string;
 }
 
+/**
+ * Counts up to `value` when scrolled into view. The FINAL number is what
+ * the server renders, so crawlers, no-JS visitors, and reduced-motion
+ * users always see the real stat — never "0+". The count-up is layered
+ * on top after hydration and writes straight to the DOM (no React
+ * re-render on every frame).
+ */
 export default function AnimatedStat({
   value,
   prefix = "",
@@ -27,39 +34,49 @@ export default function AnimatedStat({
   decimals = 0,
   label,
 }: AnimatedStatProps) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const [display, setDisplay] = useState((0).toFixed(decimals));
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const numRef = useRef<HTMLSpanElement>(null);
+  const final = value.toFixed(decimals);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    const wrap = wrapRef.current;
+    const num = numRef.current;
+    if (!wrap || !num) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
+    num.textContent = (0).toFixed(decimals);
     const counter = { val: 0 };
+
     const ctx = gsap.context(() => {
       gsap.to(counter, {
         val: value,
         duration: 1.4,
         ease: "power2.out",
         scrollTrigger: {
-          trigger: el,
+          trigger: wrap,
           start: "top 90%",
           once: true,
         },
-        onUpdate: () => setDisplay(counter.val.toFixed(decimals)),
+        onUpdate: () => {
+          num.textContent = counter.val.toFixed(decimals);
+        },
+        onComplete: () => {
+          num.textContent = value.toFixed(decimals);
+        },
       });
-    });
+    }, wrap);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      num.textContent = value.toFixed(decimals);
+    };
   }, [value, decimals]);
 
   return (
-    <div className="flex flex-col items-center px-4">
-      <span
-        ref={ref}
-        className="font-display text-2xl font-bold text-accent-light"
-      >
+    <div ref={wrapRef} className="flex flex-col items-center px-4">
+      <span className="font-display text-2xl font-bold text-accent-light">
         {prefix}
-        {display}
+        <span ref={numRef}>{final}</span>
         {suffix}
       </span>
       <span className="text-xs text-text-muted">{label}</span>

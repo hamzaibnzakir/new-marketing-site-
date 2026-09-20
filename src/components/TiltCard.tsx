@@ -9,7 +9,9 @@ export default function TiltCard({ children }: { children: ReactNode }) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia("(pointer: coarse)").matches) return; // touch devices skip tilt
+    // Touch devices and reduced-motion visitors skip the tilt.
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const rotX = gsap.quickTo(el, "rotateX", { duration: 0.4, ease: "power3.out" });
     const rotY = gsap.quickTo(el, "rotateY", { duration: 0.4, ease: "power3.out" });
@@ -37,7 +39,9 @@ export default function TiltCard({ children }: { children: ReactNode }) {
 
   return (
     <div style={{ perspective: 800 }}>
-      <div ref={ref} className="transition-transform" style={{ transformStyle: "preserve-3d" }}>
+      {/* No CSS transition here on purpose — GSAP owns the transform, and
+          a CSS transition on the same property fights it (mushy tilt). */}
+      <div ref={ref} className="will-change-transform">
         {children}
       </div>
     </div>

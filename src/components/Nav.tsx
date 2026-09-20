@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { APPLY_URL } from "@/lib/links";
 export default function Nav() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-black/80 backdrop-blur-md">
@@ -12,7 +13,7 @@ export default function Nav() {
         </Link>
 
         <Link
-          href="/apply"
+          href={APPLY_URL}
           className="border border-accent-2-light bg-accent-2 px-5 py-3 font-display text-sm font-semibold tracking-wide text-white transition-colors hover:bg-accent-2-light"
         >
           Apply Now

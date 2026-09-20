@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import LegalLayout from "@/components/LegalLayout";
 
 export const metadata: Metadata = {
@@ -158,7 +159,7 @@ export default function TermsPage() {
       <h2>16. Contact</h2>
       <p>
         Questions about these Terms can be directed to us via the{" "}
-        <a href="/contact">contact page</a>.
+        <Link href="/contact">contact page</Link>.
       </p>
     </LegalLayout>
   );

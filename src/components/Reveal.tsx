@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, type ReactNode } from "react";
+import { useRef, useEffect, type CSSProperties, type ReactNode } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -17,8 +17,12 @@ interface RevealProps {
 
 /**
  * Fades + lifts content in as it enters the viewport. One-shot, tied to
- * actual scroll position (not a generic on-mount fade) — the effect that
- * powers most of the section entrances across the site.
+ * actual scroll position.
+ *
+ * The hidden starting state comes from CSS (see `[data-reveal]` in
+ * globals.css), so there's no flash of visible content before the
+ * animation starts. Skipped entirely for visitors who prefer reduced
+ * motion.
  */
 export default function Reveal({
   children,
@@ -31,6 +35,11 @@ export default function Reveal({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.dataset.reveal = "done";
+      return;
+    }
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -47,6 +56,10 @@ export default function Reveal({
             start: "top 85%",
             once: true,
           },
+          onComplete: () => {
+            el.dataset.reveal = "done";
+            gsap.set(el, { clearProps: "opacity,transform" });
+          },
         }
       );
     }, ref);
@@ -55,7 +68,12 @@ export default function Reveal({
   }, [delay, y]);
 
   return (
-    <div ref={ref} className={className}>
+    <div
+      ref={ref}
+      className={className}
+      data-reveal=""
+      style={{ "--reveal-y": `${y}px` } as CSSProperties}
+    >
       {children}
     </div>
   );

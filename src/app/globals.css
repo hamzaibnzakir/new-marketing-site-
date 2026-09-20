@@ -39,8 +39,8 @@
   --color-accent-dim: var(--accent-dim);
   --color-accent-2: var(--accent-2);
   --color-accent-2-light: var(--accent-2-light);
-  --font-display: var(--font-display);
-  --font-body: var(--font-body);
+  --font-display: var(--font-syne);
+  --font-body: var(--font-dm-sans);
 }
 
 html {
@@ -50,7 +50,7 @@ html {
 body {
   background: var(--black);
   color: var(--text);
-  font-family: var(--font-body), sans-serif;
+  font-family: var(--font-dm-sans), sans-serif;
   font-weight: 300;
   line-height: 1.7;
   overflow-x: hidden;
@@ -147,4 +147,47 @@ body {
   color: var(--accent-light);
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------
+   Scroll reveal — initial hidden state lives in CSS so there's no
+   "visible → snaps hidden → fades in" flash on load. Only applies
+   when scripts are enabled AND the visitor hasn't asked for reduced
+   motion; otherwise content is simply visible (no-JS, crawlers,
+   reduced-motion all get the full page). Reveal.tsx animates it in,
+   then marks it data-reveal="done".
+------------------------------------------------------------------- */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  [data-reveal]:not([data-reveal="done"]) {
+    opacity: 0;
+    transform: translateY(var(--reveal-y, 24px));
+  }
+}
+
+/* Hero headline — pure CSS so it animates on first paint instead of
+   waiting for JS hydration (and is visible with JS off). */
+@keyframes word-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+.stagger-word {
+  display: inline-block;
+  margin-right: 0.28em;
+  animation: word-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 60ms + 100ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stagger-word {
+    animation: none;
+  }
 }

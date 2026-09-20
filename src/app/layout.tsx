@@ -2,16 +2,17 @@ import type { Metadata } from "next";
 import { Syne, DM_Sans } from "next/font/google";
 import Script from "next/script";
 import CustomCursor from "@/components/CustomCursor";
+import ScrollRefresh from "@/components/ScrollRefresh";
 import "./globals.css";
 
 const syne = Syne({
-  variable: "--font-display",
+  variable: "--font-syne",
   subsets: ["latin"],
   weight: ["400", "600", "700", "800"],
 });
 
 const dmSans = DM_Sans({
-  variable: "--font-body",
+  variable: "--font-dm-sans",
   subsets: ["latin"],
   weight: ["300", "400", "500"],
 });
@@ -130,6 +131,7 @@ export default function RootLayout({
           />
         </noscript>
         <CustomCursor />
+        <ScrollRefresh />
         {children}
       </body>
     </html>
