@@ -108,7 +108,7 @@ export default function RootLayout({
         {/* Meta Pixel — carried over from legacy site */}
         <Script id="meta-pixel" strategy="afterInteractive">
           {`
-            !function(f,b,e,v,n,t,s)
+            function loadMetaPixel(){if(localStorage.getItem('bb_analytics_consent')!=='granted'||window.fbq)return;!function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
             n.callMethod.apply(n,arguments):n.queue.push(arguments)};
             if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
@@ -116,20 +116,14 @@ export default function RootLayout({
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '1326208752933292');
-            fbq('track', 'PageView');
+            fbq('init', '1326208752933292');fbq('track', 'PageView');}
+            loadMetaPixel();window.addEventListener('bb:consent-granted',loadMetaPixel);
           `}
         </Script>
-        <noscript>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=1326208752933292&ev=PageView&noscript=1"
-            alt=""
-          />
-        </noscript>
+        <Script src="/brainbox.js" strategy="afterInteractive" data-site-id="main_marketing" data-endpoint="https://analytics-api.brainboxecomlab.com/api/v1/events" />
+        <Script id="brainbox-analytics-init" strategy="afterInteractive">
+          {`window.addEventListener('load',function(){if(window.brainbox)window.brainbox.init({siteId:'main_marketing',endpoint:'https://analytics-api.brainboxecomlab.com/api/v1/events',consentRequired:true});});`}
+        </Script>
         <CustomCursor />
         <ScrollRefresh />
         {children}
