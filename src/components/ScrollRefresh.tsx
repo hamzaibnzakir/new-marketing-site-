@@ -17,11 +17,27 @@ if (typeof window !== "undefined") {
  */
 export default function ScrollRefresh() {
   useEffect(() => {
+    // ScrollTrigger.refresh() restores the scroll position it measured,
+    // which cancels a smooth scroll that's in progress (e.g. tapping a
+    // menu link to a section). So a pending refresh waits until scrolling
+    // has been idle for a moment.
     let timer: ReturnType<typeof setTimeout>;
-    const refresh = () => {
+    let pending = false;
+    const schedule = () => {
       clearTimeout(timer);
-      timer = setTimeout(() => ScrollTrigger.refresh(), 150);
+      timer = setTimeout(() => {
+        pending = false;
+        ScrollTrigger.refresh();
+      }, 200);
     };
+    const refresh = () => {
+      pending = true;
+      schedule();
+    };
+    const onScroll = () => {
+      if (pending) schedule();
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     // Fonts + full page load
     document.fonts?.ready.then(refresh);
@@ -41,6 +57,7 @@ export default function ScrollRefresh() {
     return () => {
       clearTimeout(timer);
       window.removeEventListener("load", refresh);
+      window.removeEventListener("scroll", onScroll);
       ro.disconnect();
     };
   }, []);

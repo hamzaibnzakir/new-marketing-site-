@@ -1,69 +1,109 @@
-import Link from "next/link";
-import Reveal from "./Reveal";
-import AuroraBackground from "./AuroraBackground";
-import HeroParallaxGrid from "./HeroParallaxGrid";
-import BorderBeam from "./BorderBeam";
-import MagneticButton from "./MagneticButton";
-import StaggerHeadline from "./StaggerHeadline";
-import AnimatedStat from "./AnimatedStat";
+import HeroBox from "./HeroBox";
+import { ApplyButton, Container, Eyebrow } from "./ui";
 
-import { APPLY_URL } from "@/lib/links";
+/*
+  Stats are carried over from the previous site as stated by the
+  business. Keep them only while they're backed by records.
+*/
+const stats = [
+  { value: "300+", label: "students mentored" },
+  { value: "12+", label: "countries" },
+  { value: "4.9★", label: "from 200+ reviews" },
+];
+
 export default function Hero() {
   return (
-    <section className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-6 pt-20 text-center md:min-h-[92vh]">
-      <AuroraBackground />
-      <HeroParallaxGrid />
+    <section className="relative overflow-hidden pb-16 pt-8 md:pb-20 lg:pt-10">
 
-      <div className="relative z-10 flex flex-col items-center">
-        <Reveal>
-          <p className="font-display text-xs font-semibold uppercase tracking-[0.35em] text-accent-light">
-            E-commerce Mentorship
-          </p>
-        </Reveal>
+      <Container>
+        <div className="grid items-center gap-y-6 lg:grid-cols-12 lg:gap-x-6">
+          <div className="lg:col-span-7 lg:py-16">
+            <div className="hero-in" style={{ "--d": 0 } as React.CSSProperties}>
+              <Eyebrow>1-on-1 dropshipping mentorship</Eyebrow>
+            </div>
 
-        <StaggerHeadline
-          className="mt-6 max-w-4xl font-display text-4xl font-bold leading-[1.1] sm:text-5xl md:text-6xl"
-          lines={[
-            { text: "Master the art of" },
-            { text: "profitable dropshipping", className: "text-accent-light" },
-          ]}
-        />
-
-        <Reveal delay={0.5}>
-          <p className="mt-6 max-w-xl text-balance text-base text-text-muted md:text-lg">
-            Real stores. Real revenue. We build, run the ads, and mentor you
-            directly — no theory-only courses, no guesswork.
-          </p>
-        </Reveal>
-
-        <Reveal delay={0.6}>
-          <MagneticButton>
-            <BorderBeam className="mt-10 inline-block">
-              <Link
-                href={APPLY_URL}
-                className="block bg-accent-2 px-8 py-4 font-display text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-accent-2-light"
+            <h1 className="display-xl mt-6 text-[clamp(2.75rem,1.2rem+5.2vw,5.6rem)]">
+              <span
+                className="hero-in block"
+                style={{ "--d": 80 } as React.CSSProperties}
               >
-                Apply for Mentorship
-              </Link>
-            </BorderBeam>
-          </MagneticButton>
-        </Reveal>
+                Build a store
+              </span>{" "}
+              <span
+                className="hero-in block"
+                style={{ "--d": 160 } as React.CSSProperties}
+              >
+                that actually
+              </span>{" "}
+              <span
+                className="hero-in block text-accent-light"
+                style={{ "--d": 240 } as React.CSSProperties}
+              >
+                sells.
+              </span>
+            </h1>
 
-        <Reveal delay={0.7}>
-          <div className="mt-16 flex flex-wrap items-center justify-center gap-x-2 gap-y-4">
-            <AnimatedStat value={300} suffix="+" label="Students mentored" />
-            <span className="hidden h-8 w-px bg-border sm:block" />
-            <AnimatedStat value={12} suffix="+" label="Countries reached" />
-            <span className="hidden h-8 w-px bg-border sm:block" />
-            <AnimatedStat
-              value={4.9}
-              decimals={1}
-              suffix="★"
-              label="From 200+ reviews"
-            />
+            <p
+              className="hero-in mt-7 max-w-[34rem] text-[17px] leading-relaxed text-text-muted md:text-lg"
+              style={{ "--d": 360 } as React.CSSProperties}
+            >
+              We build your Shopify store with you, run AI-assisted Meta ads
+              alongside you, and mentor you 1-on-1 on your actual store, from
+              first product to first sales to scaling.
+            </p>
+
+            <div
+              className="hero-in mt-9 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6"
+              style={{ "--d": 460 } as React.CSSProperties}
+            >
+              <ApplyButton placement="hero" size="lg" />
+              <a
+                href="#results"
+                className="inline-flex h-14 items-center justify-center gap-2 border border-border px-6 font-display text-[15px] font-bold text-text transition-colors hover:border-white/30 sm:border-0 sm:px-0"
+              >
+                See real results
+                <span aria-hidden="true" className="text-accent-light">
+                  ↓
+                </span>
+              </a>
+            </div>
+
+            <p
+              className="hero-in mt-5 font-mono text-[12px] tracking-wide text-text-muted"
+              style={{ "--d": 540 } as React.CSSProperties}
+            >
+              5 quick questions · We reply on WhatsApp, usually within a day
+            </p>
           </div>
-        </Reveal>
-      </div>
+
+          <div className="-mx-[6%] lg:col-span-5 lg:-ml-[18%] lg:mr-[-4%]">
+            <div className="mx-auto max-w-[580px] lg:max-w-none">
+              <HeroBox />
+            </div>
+          </div>
+        </div>
+
+        <ul
+          className="hero-in mt-10 grid grid-cols-3 border-y border-border lg:mt-6"
+          style={{ "--d": 700 } as React.CSSProperties}
+        >
+          {stats.map((s, i) => (
+            <li
+              key={s.label}
+              className={`flex flex-col gap-1 py-5 sm:flex-row sm:items-baseline sm:gap-3 sm:py-6 ${
+                i > 0 ? "border-l border-border pl-4 sm:pl-8" : ""
+              }`}
+            >
+              <span className="font-display text-2xl font-bold text-text md:text-3xl">
+                {s.value}
+              </span>
+              <span className="text-[13px] leading-tight text-text-muted">
+                {s.label}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </Container>
     </section>
   );
 }

@@ -15,7 +15,7 @@ export default function LegalLayout({
     <>
       <Nav />
       <main className="mx-auto max-w-3xl px-6 py-20 md:py-28">
-        <p className="font-display text-xs font-semibold uppercase tracking-[0.35em] text-accent-light">
+        <p className="font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-accent-light">
           Legal
         </p>
         <h1 className="mt-4 font-display text-3xl font-bold md:text-4xl">

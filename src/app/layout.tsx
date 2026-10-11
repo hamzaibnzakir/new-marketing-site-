@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { Syne, DM_Sans } from "next/font/google";
+import { Syne, DM_Sans, IBM_Plex_Mono } from "next/font/google";
 import Script from "next/script";
-import CustomCursor from "@/components/CustomCursor";
 import ScrollRefresh from "@/components/ScrollRefresh";
 import "./globals.css";
 
@@ -14,16 +13,22 @@ const syne = Syne({
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
   subsets: ["latin"],
-  weight: ["300", "400", "500"],
+  weight: ["400", "500", "700"],
+});
+
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
+  subsets: ["latin"],
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "BrainBox Ecom Lab — Scale Your Dropshipping Business",
+    default: "BrainBox Ecom Lab — 1-on-1 Dropshipping Mentorship",
     template: "%s | BrainBox Ecom Lab",
   },
   description:
-    "BrainBox Ecom Lab is a hands-on e-commerce mentorship program. We build your store, run AI-driven ad strategy, and mentor you directly to launch, scale, and automate a profitable dropshipping business.",
+    "Build a Shopify store that actually sells. BrainBox Ecom Lab builds your store with you, runs AI-assisted Meta ads alongside you, and mentors you 1-on-1 on your actual store.",
   keywords: [
     "dropshipping mentorship",
     "ecommerce mentorship",
@@ -46,9 +51,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "BrainBox Ecom Lab — Scale Your Dropshipping Business",
+    title: "BrainBox Ecom Lab — Build a store that actually sells",
     description:
-      "Real stores. Real revenue. We build, run the ads, and mentor you directly — no theory-only courses, no guesswork.",
+      "1-on-1 dropshipping mentorship. We build your store with you, run the ads alongside you, and mentor you on your actual store.",
     url: "https://brainboxecomlab.com",
     siteName: "BrainBox Ecom Lab",
     type: "website",
@@ -56,9 +61,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "BrainBox Ecom Lab — Scale Your Dropshipping Business",
+    title: "BrainBox Ecom Lab — Build a store that actually sells",
     description:
-      "Real stores. Real revenue. We build, run the ads, and mentor you directly.",
+      "1-on-1 dropshipping mentorship. We build your store with you, run the ads alongside you, and mentor you on your actual store.",
   },
   icons: {
     icon: "/B.png",
@@ -73,7 +78,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${dmSans.variable} h-full antialiased`}
+      className={`${syne.variable} ${dmSans.variable} ${plexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-black text-white">
         {/* Structured data — helps AI answer engines (GEO/AEO) and
@@ -124,7 +129,6 @@ export default function RootLayout({
         <Script id="brainbox-analytics-init" strategy="afterInteractive">
           {`window.addEventListener('load',function(){if(window.brainbox)window.brainbox.init({siteId:'main_marketing',endpoint:'https://analytics-api.brainboxecomlab.com/api/v1/events',consentRequired:true});});`}
         </Script>
-        <CustomCursor />
         <ScrollRefresh />
         {children}
       </body>
