@@ -1,30 +1,35 @@
 import Reveal from "./Reveal";
 import FAQItem from "./FAQItem";
+import { ApplyButton, Container, Eyebrow } from "./ui";
 
 const faqs = [
   {
     q: "What is BrainBox Ecom Lab, and how does it work?",
-    a: "BrainBox Ecom Lab is a hands-on e-commerce mentorship program. We combine direct mentorship, AI-driven ad strategy, and store-build support to help you launch, scale, and automate a profitable dropshipping business.",
-  },
-  {
-    q: "How fast can I start making money?",
-    a: "Most students make their first sale within 2–4 weeks of following the program's strategies. Results depend on your effort, niche, and ad budget — we guide you through every step.",
+    a: "BrainBox Ecom Lab is a hands-on e-commerce mentorship program. We combine direct 1-on-1 mentorship, AI-assisted ad strategy and store-build support to help you launch, scale and automate a dropshipping business.",
   },
   {
     q: "Do I need experience to join?",
-    a: "No. The program is built for beginners, while still providing advanced strategy for people already running a store. You get what you need at whatever stage you're starting from.",
+    a: "No. The program is built for complete beginners, while still covering advanced strategy for people already running a store. You get what you need from wherever you're starting.",
   },
   {
-    q: "What makes BrainBox different from a generic course?",
-    a: "Most courses are pre-recorded videos you watch alone. BrainBox pairs you with direct mentorship on your actual store, AI-driven strategy that adapts to what's working right now, and ongoing community support — not a course you finish once and forget.",
-  },
-  {
-    q: "How do I get support once I've joined?",
-    a: "You get access to a private community, direct messaging with your mentor, and regular group calls. Support continues through the program, not just at onboarding.",
+    q: "What happens after I apply?",
+    a: "You answer five quick multiple-choice questions and leave your contact details. We reply on WhatsApp, usually within a day, to talk through your goals, your budget and whether the mentorship is the right fit.",
   },
   {
     q: "How much does the mentorship cost?",
-    a: "Pricing depends on the level of support you need — from guided store setup to a fully done-for-you build. We discuss the right fit and pricing after you apply, so it's matched to your goals rather than a one-size-fits-all number.",
+    a: "Pricing depends on the level of support you need, from guided store setup to a fully done-for-you build. We go through the right fit and pricing after you apply, so it's matched to your goals rather than a one-size-fits-all number.",
+  },
+  {
+    q: "Do I need a separate budget for ads?",
+    a: "Yes. Apart from the mentorship itself, a store needs an operating budget for ads and tools. The application asks what you're working with so the plan we suggest is realistic for it.",
+  },
+  {
+    q: "How fast can I start making money?",
+    a: "Most students make their first sale within 2–4 weeks of following the program's strategies. Results depend on your effort, niche and ad budget, and no result is guaranteed. We guide you through every step.",
+  },
+  {
+    q: "How do I get support once I've joined?",
+    a: "You get direct messaging with your mentor, regular group calls and a private community. Support continues through the program, not just at onboarding.",
   },
 ];
 
@@ -35,38 +40,50 @@ export default function FAQSection() {
     mainEntity: faqs.map((f) => ({
       "@type": "Question",
       name: f.q,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: f.a,
-      },
+      acceptedAnswer: { "@type": "Answer", text: f.a },
     })),
   };
 
   return (
-    <section className="mx-auto max-w-3xl px-6 py-24 md:py-32">
-      {/* Structured data — helps AI answer engines and search surface
-          these Q&As directly. */}
+    <section
+      id="faq"
+      className="bg-paper py-24 md:py-36"
+      aria-labelledby="faq-title"
+    >
+      {/* Structured data so search and AI answer engines can surface these Q&As. */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-
-      <Reveal>
-        <p className="font-display text-xs font-semibold uppercase tracking-[0.35em] text-accent-light">
-          FAQ
-        </p>
-        <h2 className="mt-4 font-display text-3xl font-bold leading-tight md:text-4xl">
-          Have questions? We&apos;ve got answers.
-        </h2>
-      </Reveal>
-
-      <div className="mt-12 divide-y divide-border border-t border-border">
-        {faqs.map((f, i) => (
-          <Reveal key={f.q} delay={Math.min(i * 0.06, 0.3)}>
-            <FAQItem q={f.q} a={f.a} />
-          </Reveal>
-        ))}
-      </div>
+      <Container>
+        <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
+          <div className="lg:col-span-4">
+            <div className="lg:sticky lg:top-32">
+              <Reveal>
+                <Eyebrow>FAQ</Eyebrow>
+                <h2
+                  id="faq-title"
+                  className="serif mt-6 text-[clamp(3rem,1.4rem+4vw,5.4rem)]"
+                >
+                  Before you <em>apply.</em>
+                </h2>
+                <p className="mt-5 max-w-sm text-[16px] leading-relaxed text-muted">
+                  Anything else, ask us in the application. Every one gets a
+                  real reply.
+                </p>
+              </Reveal>
+            </div>
+          </div>
+          <div className="divide-y divide-line border-y border-line lg:col-span-8">
+            {faqs.map((f) => (
+              <FAQItem key={f.q} q={f.q} a={f.a} />
+            ))}
+          </div>
+        </div>
+        <div className="mt-12 lg:hidden">
+          <ApplyButton placement="faq" />
+        </div>
+      </Container>
     </section>
   );
 }

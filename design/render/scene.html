@@ -1,0 +1,206 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:transparent}canvas{display:block}</style>
+<script type="importmap">
+{ "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/" } }
+</script>
+</head><body>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+const params = new URLSearchParams(location.search);
+const MODE = params.get('mode') || 'box';
+const SIZE = +(params.get('size') || 1100);
+
+await Promise.all([
+  new FontFace('DMB', 'url(./dmsans700.woff2)').load().then(f => document.fonts.add(f)),
+]);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(SIZE, SIZE);
+renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.toneMappingExposure = 0.95;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.VSMShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+// ---------- textures ----------
+function tapeTexture(text, bg, fg) {
+  const c = document.createElement('canvas'); c.width = 2048; c.height = 160;
+  const g = c.getContext('2d');
+  g.fillStyle = bg; g.fillRect(0, 0, c.width, c.height);
+  // subtle plastic sheen streaks
+  for (let i = 0; i < 60; i++) { g.fillStyle = `rgba(255,255,255,${Math.random()*0.05})`; g.fillRect(Math.random()*c.width, 0, 2 + Math.random()*30, c.height); }
+  g.fillStyle = fg; g.font = '700 74px DMB'; g.textBaseline = 'middle';
+  const unitW = g.measureText(text).width + 40 + 150;
+  const n = Math.max(1, Math.round(c.width / unitW)), step = c.width / n;
+  for (let i = 0; i < n; i++) {
+    const x = i * step + 20;
+    g.fillText(text, x, 84);
+    g.save(); g.translate(x + g.measureText(text).width + 34, 0);
+    for (let k = 0; k < 3; k++) { g.beginPath(); g.moveTo(k*30, 140); g.lineTo(k*30 + 16, 140); g.lineTo(k*30 + 40, 20); g.lineTo(k*30 + 24, 20); g.closePath(); g.fill(); }
+    g.restore();
+  }
+  // edges
+  g.fillStyle = 'rgba(0,0,0,0.18)'; g.fillRect(0, 0, c.width, 5); g.fillRect(0, c.height - 5, c.width, 5);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; t.anisotropy = 8;
+  return t;
+}
+function grainTexture(base) {
+  const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d');
+  g.fillStyle = base; g.fillRect(0, 0, 512, 512);
+  const img = g.getImageData(0, 0, 512, 512);
+  for (let i = 0; i < img.data.length; i += 4) { const n = (Math.random() - 0.5) * 14; img.data[i] += n; img.data[i+1] += n; img.data[i+2] += n; }
+  g.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+
+// ---------- B logo shape (traced from public/B.png, 500px space) ----------
+function bShape() {
+  const P = (x, y) => new THREE.Vector2((x - 250) / 100, -(y - 255) / 100);
+  const outer = [[121,86],[127,80],[340,80],[346,86],[351,102],[363,103],[368,110],[368,181],[365,185],[351,187],[345,192],[345,204],[339,209],[316,210],[312,214],[312,228],[318,232],[353,233],[357,239],[357,250],[361,254],[373,255],[379,262],[379,381],[376,385],[361,386],[357,391],[356,404],[353,408],[341,408],[336,412],[334,425],[330,430],[125,430],[121,425]];
+  const s = new THREE.Shape(outer.map(([x,y]) => P(x,y)));
+  const hole = pts => new THREE.Path(pts.map(([x,y]) => P(x,y)));
+  s.holes.push(hole([[222,104],[227,102],[238,102],[244,106],[244,124],[263,125],[267,129],[267,182],[263,186],[245,187],[245,204],[239,208],[227,208],[222,204]].reverse()));
+  s.holes.push(hole([[222,235],[227,233],[240,233],[245,237],[245,254],[264,256],[268,260],[268,382],[264,386],[245,388],[245,404],[239,408],[227,408],[222,404]].reverse()));
+  return s;
+}
+
+// ---------- ribbon along a curve ----------
+function ribbon(curve, width, segs, tex, twist = 0, repeat = 6, flipV = false, revU = false) {
+  const pos = [], uv = [], idx = [];
+  for (let i = 0; i <= segs; i++) {
+    const t = i / segs, p = curve.getPointAt(t), T = curve.getTangentAt(t);
+    const R = new THREE.Vector3(p.x, 0, p.z).normalize();
+    let W = new THREE.Vector3().crossVectors(R, T).normalize();
+    W.applyAxisAngle(T, Math.sin(t * Math.PI * 2) * twist);
+    const a = p.clone().addScaledVector(W, width / 2), b = p.clone().addScaledVector(W, -width / 2);
+    pos.push(a.x, a.y, a.z, b.x, b.y, b.z); const uu = (revU ? 1 - t : t) * repeat; uv.push(uu, flipV ? 0 : 1, uu, flipV ? 1 : 0);
+    if (i < segs) { const k = i * 2; idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2); }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx); g.computeVertexNormals();
+  const grp = new THREE.Group();
+  const backTexX = tex.clone(); backTexX.needsUpdate = true; backTexX.repeat.set(-1, 1);
+  const front = new THREE.Mesh(g, new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.12, side: THREE.FrontSide }));
+  const back = new THREE.Mesh(g, new THREE.MeshPhysicalMaterial({ map: backTexX, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.12, side: THREE.BackSide }));
+  front.castShadow = true; grp.add(front, back); return grp;
+}
+
+const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
+
+if (MODE === 'box') {
+  const W = 2.2, H = 1.7, D = 2.2;
+  const group = new THREE.Group(); scene.add(group);
+
+  const boxMat = new THREE.MeshPhysicalMaterial({ map: grainTexture('#0a6b45'), roughness: 0.62, clearcoat: 0.25, clearcoatRoughness: 0.5 });
+  const box = new THREE.Mesh(new RoundedBoxGeometry(W, H, D, 6, 0.06), boxMat);
+  box.castShadow = true; box.receiveShadow = true; group.add(box);
+
+  // top flap seam
+  const seam = new THREE.Mesh(new THREE.BoxGeometry(W * 0.98, 0.006, 0.012), new THREE.MeshStandardMaterial({ color: '#06321f', roughness: 0.9 }));
+  seam.position.y = H / 2 + 0.001; group.add(seam);
+
+  const tex = tapeTexture('BRAINBOX', '#21c47f', '#03110a');
+  const tapeMat = (rep) => { const t = tex.clone(); t.needsUpdate = true; t.repeat.set(rep, 1); return new THREE.MeshPhysicalMaterial({ map: t, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.12 }); };
+  const TW = 0.36, e = 0.012;
+  // strap: wrap around a given axis at offset, as 4 slabs
+  function strap(axis, offset, width = TW) {
+    const g = new THREE.Group();
+    if (axis === 'y') { // horizontal band around the sides
+      [[0, 0, D/2 + e, W, 0],[W/2 + e, 0, 0, D, Math.PI/2],[0, 0, -D/2 - e, W, Math.PI],[-W/2 - e, 0, 0, D, -Math.PI/2]].forEach(([x,y,z,len,ry]) => {
+        const m = new THREE.Mesh(new THREE.PlaneGeometry(len + 2*e, width), tapeMat(len / 1.1)); m.position.set(x, offset, z); m.rotation.y = ry; m.castShadow = true; g.add(m);
+      });
+    } else { // axis 'x': band in plane x = offset over top, front, bottom, back
+      const tg = new THREE.PlaneGeometry(D + 2*e, width); tg.rotateZ(Math.PI/2); tg.rotateX(-Math.PI/2);
+      const top = new THREE.Mesh(tg, tapeMat(D/1.1)); top.position.set(offset, H/2 + e, 0);
+      const fg = new THREE.PlaneGeometry(H * 0.62, width); fg.rotateZ(Math.PI/2);
+      const front = new THREE.Mesh(fg, tapeMat(0.62*H/1.1)); front.position.set(offset, H/2 - H*0.31, D/2 + e);
+      const back = new THREE.Mesh(fg.clone(), tapeMat(0.62*H/1.1)); back.rotation.y = Math.PI; back.position.set(offset, H/2 - H*0.31, -D/2 - e);
+      top.castShadow = true;
+      g.add(top, front, back);
+    }
+    group.add(g); return g;
+  }
+  strap('y', 0.18);
+  strap('x', 0.0);
+
+  // B mark printed on the left face (visible at 3/4 view)
+  const bGeo = new THREE.ShapeGeometry(bShape(), 6);
+  const bMark = new THREE.Mesh(bGeo, new THREE.MeshPhysicalMaterial({ color: '#06150e', roughness: 0.6, clearcoat: 0.3 }));
+  bMark.scale.setScalar(0.22); bMark.position.set(-W/2 - 0.004, -0.45, 0.45); bMark.rotation.y = -Math.PI/2; group.add(bMark);
+  // shipping label on the front-right face
+  const lc = document.createElement('canvas'); lc.width = 512; lc.height = 300; const lg = lc.getContext('2d');
+  lg.fillStyle = '#efeae0'; lg.fillRect(0,0,512,300); lg.fillStyle = '#0b0b0b'; lg.fillRect(0,0,512,56);
+  lg.fillStyle = '#efeae0'; lg.font = '700 30px DMB'; lg.fillText('SHIP TO: YOUR FIRST SALE', 22, 39);
+  lg.fillStyle = '#0b0b0b'; lg.font = '700 26px DMB'; lg.fillText('CONTENTS', 22, 104);
+  lg.font = '700 24px DMB'; ['1x STORE BUILD', '1x AD STRATEGY', '1x 1-ON-1 MENTOR'].forEach((t, i) => lg.fillText(t, 22, 148 + i*40));
+  for (let i = 0; i < 26; i++) lg.fillRect(330 + i*6, 92, i % 3 ? 2 : 4, 170);
+  const lt = new THREE.CanvasTexture(lc); lt.colorSpace = THREE.SRGBColorSpace;
+  const label = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 0.56), new THREE.MeshPhysicalMaterial({ map: lt, roughness: 0.7 }));
+  label.position.set(0.52, -0.42, D/2 + 0.006); group.add(label);
+
+  // loose tape ribbons swirling around the box
+  const rTex = tapeTexture('BRAINBOX', '#21c47f', '#03110a');
+  const c1 = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-1.75, 0.12, 1.75), new THREE.Vector3(-0.9, 0.35, 1.85), new THREE.Vector3(0.9, 0.75, 1.72),
+    new THREE.Vector3(1.75, 1.05, 0.6), new THREE.Vector3(1.6, 1.25, -1.0), new THREE.Vector3(0.2, 1.35, -1.75),
+    new THREE.Vector3(-1.4, 1.5, -1.2), new THREE.Vector3(-1.85, 1.75, 0.3), new THREE.Vector3(-1.2, 2.15, 1.25), new THREE.Vector3(0.3, 2.55, 1.6)
+  ]);
+  group.add(ribbon(c1, 0.34, 500, rTex, 0.35, 6.5));
+  const c2 = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(2.0, -1.2, 1.1), new THREE.Vector3(1.4, -0.98, 1.7), new THREE.Vector3(0.0, -0.75, 1.78),
+    new THREE.Vector3(-1.6, -0.6, 1.5), new THREE.Vector3(-1.85, -0.45, -0.2), new THREE.Vector3(-0.9, -0.3, -1.7)
+  ]);
+  const rTex2 = rTex.clone(); rTex2.needsUpdate = true;
+  group.add(ribbon(c2, 0.3, 400, rTex2, 0.6, 4.2, true, true));
+
+  // shadow catcher
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.ShadowMaterial({ opacity: 0.16 }));
+  floor.rotation.x = -Math.PI/2; floor.position.y = -1.75; floor.receiveShadow = true; scene.add(floor);
+
+  const key = new THREE.DirectionalLight('#ffffff', 2.6); key.position.set(1.6, 9, 3.2); key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048); key.shadow.camera.left = -5; key.shadow.camera.right = 5; key.shadow.camera.top = 5; key.shadow.camera.bottom = -5; key.shadow.radius = 10; key.shadow.blurSamples = 20;
+  scene.add(key);
+  const rim = new THREE.DirectionalLight('#c9ffe6', 1.4); rim.position.set(-6, 3, -4); scene.add(rim);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#9a9a9a', 0.5));
+
+  camera.position.set(0, 2.5, 11.4); camera.lookAt(0, 0.4, 0);
+  group.position.y = 0.05;
+  group.rotation.x = 0.08; group.rotation.z = -0.05;
+
+  window.renderFrame = (yawDeg) => { group.rotation.y = THREE.MathUtils.degToRad(yawDeg); renderer.render(scene, camera); return renderer.domElement.toDataURL('image/png'); };
+} else {
+  // glowing B logo on dark
+  renderer.setClearColor('#050505', 1);
+  const geo = new THREE.ExtrudeGeometry(bShape(), { depth: 0.55, bevelEnabled: true, bevelThickness: 0.12, bevelSize: 0.07, bevelSegments: 8, curveSegments: 12 });
+  geo.center();
+  const mat = new THREE.MeshPhysicalMaterial({ color: '#14a86c', metalness: 0.55, roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.05, emissive: '#0a6b45', emissiveIntensity: 0.08, iridescence: 0.2 });
+  const logo = new THREE.Mesh(geo, mat); scene.add(logo);
+  logo.rotation.set(-0.18, 0.55, 0.06);
+  const glow = new THREE.PointLight('#2ecc8f', 40, 9); glow.position.set(-0.4, 0.3, -1.6); scene.add(glow);
+  const key = new THREE.DirectionalLight('#ffffff', 1.1); key.position.set(3, 4, 6); scene.add(key);
+  const rim = new THREE.DirectionalLight('#7dffc8', 1.6); rim.position.set(-5, 2, -3); scene.add(rim);
+  camera.position.set(0, 0.2, 9.5); camera.lookAt(0, 0, 0);
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(SIZE, SIZE), 0.55, 0.35, 0.86));
+  composer.addPass(new OutputPass());
+  window.renderFrame = (yawDeg) => { logo.rotation.y = 0.55 + THREE.MathUtils.degToRad(yawDeg); composer.render(); return renderer.domElement.toDataURL('image/png'); };
+}
+window.ready = true;
+</script>
+</body></html>

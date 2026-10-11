@@ -1,129 +1,121 @@
 @import "tailwindcss";
 
 /*
-  Design tokens — single source of truth for the design system.
-  --accent is a PLACEHOLDER (current site's gold) until final color is
-  confirmed. Everything references this token, so the whole site
-  re-themes from one change here — no hunting through components.
+  BrainBox design system (v2, editorial).
+
+  Direction: a light, editorial page built around a real 3D render (the
+  BrainBox box wrapped in emerald packing tape), big serif headlines with
+  an italic accent word, pill CTAs, and a few dark "stage" sections for
+  contrast (the glowing 3D logo, the footer).
+
+  Colour
+  - paper / paper-2: warm light greys, the main surfaces.
+  - ink: near-black text and the dark stage sections.
+  - tape (emerald #21c47f): the brand accent. Primary CTA pill, tape,
+    highlights. Ink text on tape passes AA.
+  - forest (#0a6b45): emerald dark enough for text/links on paper.
+
+  Type
+  - Instrument Serif: display. Italic for the one emphasised word.
+  - DM Sans: body. IBM Plex Mono: labels and data.
+
+  Radius: pills (999px) for actions, 18px for cards, 10px for screenshots.
+  Motion: one easing (--ease-out), entrance 0.8–1.1s, nothing loops fast,
+  everything disabled under prefers-reduced-motion.
 */
 :root {
-  --black: #050505;
-  --surface: #0d0d0d;
-  --surface-2: #141414;
-  --text: #f0ede6;
-  --text-muted: #8a8780;
-  --border: rgba(255, 255, 255, 0.08);
+  --paper: #e6e4e0;
+  --paper-2: #dcd9d3;
+  --paper-3: #f3f1ed;
+  --ink: #0b0b0b;
+  --ink-2: #161616;
+  --muted: #5e5a53;
+  --line: rgba(11, 11, 11, 0.12);
 
-  /* LOCKED — primary accent: emerald. Used everywhere: headings,
-     links, icons, borders, glows. */
-  --accent: #0f5c3f;
-  --accent-light: #2ecc8f;
-  --accent-dim: #0a3d2a;
+  --tape: #21c47f;
+  --tape-2: #2bd690;
+  --forest: #0a6b45;
 
-  /* LOCKED — secondary accent: crimson. Used ONLY for the Apply CTA
-     and urgency badges — deliberately rare, never mixed in freely
-     with emerald elsewhere on the page. */
-  --accent-2: #8c1d2e;
-  --accent-2-light: #d63a4f;
+  --on-dark: #f0ede6;
+  --on-dark-muted: #9a978f;
+  --line-dark: rgba(255, 255, 255, 0.1);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @theme inline {
-  --color-black: var(--black);
-  --color-surface: var(--surface);
-  --color-surface-2: var(--surface-2);
-  --color-text: var(--text);
-  --color-text-muted: var(--text-muted);
-  --color-border: var(--border);
-  --color-accent: var(--accent);
-  --color-accent-light: var(--accent-light);
-  --color-accent-dim: var(--accent-dim);
-  --color-accent-2: var(--accent-2);
-  --color-accent-2-light: var(--accent-2-light);
-  --font-display: var(--font-syne);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-paper-3: var(--paper-3);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-tape: var(--tape);
+  --color-tape-2: var(--tape-2);
+  --color-forest: var(--forest);
+  --color-on-dark: var(--on-dark);
+  --color-on-dark-muted: var(--on-dark-muted);
+  --color-line-dark: var(--line-dark);
+
+  --font-serif: var(--font-instrument);
   --font-body: var(--font-dm-sans);
+  --font-mono: var(--font-plex-mono);
 }
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 84px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
-  background: var(--black);
-  color: var(--text);
+  background: var(--paper);
+  color: var(--ink);
   font-family: var(--font-dm-sans), sans-serif;
-  font-weight: 300;
-  line-height: 1.7;
+  line-height: 1.6;
   overflow-x: hidden;
 }
 
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: var(--black);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--accent-dim);
-  border-radius: 2px;
+::selection {
+  background: var(--tape);
+  color: var(--ink);
 }
 
-/* Border beam — rotating conic-gradient chasing around an element's
-   edge. @property lets the browser interpolate the angle smoothly
-   instead of snapping between keyframes. */
-@property --beam-angle {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
+:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 3px;
 }
 
-.border-beam {
-  --beam-angle: 0deg;
-  background: conic-gradient(
-    from var(--beam-angle),
-    transparent 0%,
-    var(--accent-2-light) 8%,
-    var(--accent-light) 16%,
-    transparent 28%,
-    transparent 100%
-  );
-  animation: beam-rotate 3.5s linear infinite;
+.serif {
+  font-family: var(--font-instrument), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.92;
+}
+.serif em,
+.serif i {
+  font-style: italic;
 }
 
-@keyframes beam-rotate {
-  to {
-    --beam-angle: 360deg;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .border-beam {
-    animation: none;
-    background: var(--accent-dim);
-  }
-}
-
-.has-custom-cursor,
-.has-custom-cursor a,
-.has-custom-cursor button,
-.has-custom-cursor summary {
-  cursor: none;
-}
-
-/* Legal page content — hand-styled to match the design system rather
-   than a generic typography plugin. */
+/* Legal page content */
 .legal-content h2 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.25rem;
+  font-family: var(--font-instrument), Georgia, serif;
+  font-size: 1.75rem;
   margin-top: 2.5rem;
   margin-bottom: 0.75rem;
-  color: var(--text);
+  color: var(--ink);
 }
 .legal-content h2:first-child {
   margin-top: 0;
 }
-.legal-content p {
-  color: var(--text-muted);
+.legal-content p,
+.legal-content ul {
+  color: var(--muted);
   font-size: 0.9375rem;
   line-height: 1.75;
   margin-bottom: 1rem;
@@ -131,31 +123,23 @@ body {
 .legal-content ul {
   list-style: disc;
   padding-left: 1.25rem;
-  color: var(--text-muted);
-  font-size: 0.9375rem;
-  line-height: 1.75;
-  margin-bottom: 1rem;
 }
 .legal-content li {
   margin-bottom: 0.4rem;
 }
 .legal-content strong {
-  color: var(--text);
+  color: var(--ink);
   font-weight: 600;
 }
 .legal-content a {
-  color: var(--accent-light);
+  color: var(--forest);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 /* ------------------------------------------------------------------
-   Scroll reveal — initial hidden state lives in CSS so there's no
-   "visible → snaps hidden → fades in" flash on load. Only applies
-   when scripts are enabled AND the visitor hasn't asked for reduced
-   motion; otherwise content is simply visible (no-JS, crawlers,
-   reduced-motion all get the full page). Reveal.tsx animates it in,
-   then marks it data-reveal="done".
+   Scroll reveal: hidden state in CSS (no flash), only with JS on and
+   motion allowed. Reveal.tsx animates in and marks data-reveal="done".
 ------------------------------------------------------------------- */
 @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
   [data-reveal]:not([data-reveal="done"]) {
@@ -164,30 +148,111 @@ body {
   }
 }
 
-/* Hero headline — pure CSS so it animates on first paint instead of
-   waiting for JS hydration (and is visible with JS off). */
-@keyframes word-in {
+/* Hero entrance, CSS-only so it plays on first paint */
+@keyframes rise-in {
   from {
     opacity: 0;
-    transform: translateY(18px);
-    filter: blur(6px);
+    transform: translateY(32px);
   }
   to {
     opacity: 1;
     transform: none;
-    filter: blur(0);
+  }
+}
+@keyframes render-in {
+  from {
+    opacity: 0;
+    transform: translateY(60px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 40px, 0) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+@keyframes tape-scroll {
+  to {
+    transform: translateX(-50%);
   }
 }
 
-.stagger-word {
-  display: inline-block;
-  margin-right: 0.28em;
-  animation: word-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--i, 0) * 60ms + 100ms);
+.hero-in {
+  animation: rise-in 0.9s var(--ease-out) both;
+  animation-delay: calc(var(--d, 0) * 1ms);
+}
+.render-in {
+  animation: render-in 1.2s var(--ease-out) 0.1s both;
+}
+.card-in {
+  animation: card-in 1s var(--ease-out) both;
+  animation-delay: calc(var(--d, 0) * 1ms);
+}
+.badge-spin {
+  animation: spin 18s linear infinite;
+}
+.bob {
+  animation: bob 6s ease-in-out infinite;
+}
+.tape-run {
+  animation: tape-scroll var(--tape-dur, 40s) linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .stagger-word {
+  .hero-in,
+  .render-in,
+  .card-in,
+  .badge-spin,
+  .bob,
+  .tape-run {
     animation: none;
   }
+}
+
+/* Packing tape strip (footer, process) */
+.tape {
+  background: var(--tape);
+  color: var(--ink);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+    0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* Horizontal strips */
+.snap-strip {
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted) transparent;
+}
+.snap-strip::-webkit-scrollbar {
+  height: 4px;
+}
+.snap-strip::-webkit-scrollbar-thumb {
+  background: var(--muted);
+}
+
+dialog.lightbox::backdrop {
+  background: rgba(5, 5, 5, 0.88);
 }
