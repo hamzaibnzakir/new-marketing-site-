@@ -8,10 +8,27 @@ import { ApplyButton } from "./ui";
 
 const links = [
   { href: "/#results", label: "Results" },
-  { href: "/#how", label: "How it works" },
+  { href: "/#how", label: "Process" },
   { href: "/#stories", label: "Students" },
   { href: "/#faq", label: "FAQ" },
 ];
+
+export function Wordmark({ dark = false }: { dark?: boolean }) {
+  return (
+    <span className="flex items-center gap-2.5">
+      <Image
+        src="/B.png"
+        alt=""
+        width={30}
+        height={30}
+        className={`h-[30px] w-[30px] rounded-[7px]`}
+      />
+      <span className={`whitespace-nowrap font-serif text-[23px] leading-none tracking-tight ${dark ? "text-on-dark" : "text-ink"}`}>
+        BrainBox<sup className="ml-0.5 align-super text-[11px]">®</sup>
+      </span>
+    </span>
+  );
+}
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
@@ -24,7 +41,6 @@ export default function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close the mobile menu on Escape and when resizing up to desktop.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -42,14 +58,13 @@ export default function Nav() {
     };
   }, [open]);
 
-  // Closing the menu collapses the header mid-click, which cancels the
-  // browser's own jump to the anchor on some engines. Close first, then
-  // scroll once the layout has settled.
+  // Closing the menu changes the header height mid-click, which can cancel
+  // the browser's jump. Close first, then scroll once layout settles.
   const goToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     const id = href.split("#")[1];
     const target = id ? document.getElementById(id) : null;
     setOpen(false);
-    if (!target) return; // not on the home page: let the link navigate
+    if (!target) return;
     e.preventDefault();
     requestAnimationFrame(() => {
       target.scrollIntoView({ block: "start" });
@@ -59,34 +74,30 @@ export default function Nav() {
 
   return (
     <header
-      className={`sticky top-0 z-50 border-b transition-colors duration-300 ${
+      className={`sticky top-0 z-50 transition-[background-color,box-shadow] duration-300 ${
         scrolled || open
-          ? "border-border bg-black/90 backdrop-blur-md"
-          : "border-transparent bg-black"
+          ? "bg-paper/85 shadow-[0_1px_0_var(--line)] backdrop-blur-md"
+          : "bg-paper"
       }`}
     >
       <nav
         aria-label="Main"
-        className="mx-auto flex h-[72px] w-full max-w-[1240px] items-center justify-between px-5 md:px-8"
+        className="mx-auto flex h-[72px] w-full max-w-[1280px] items-center justify-between px-5 md:px-10"
       >
-        <Link
-          href="/"
-          className="flex items-center gap-2.5 py-2"
-          onClick={() => setOpen(false)}
-        >
-          <Image src="/B.png" alt="" width={32} height={32} className="h-8 w-8" />
-          <span className="whitespace-nowrap font-display text-[15px] font-bold tracking-tight sm:text-[17px]">
-            BrainBox<span className="text-accent-light max-[400px]:hidden"> Ecom Lab</span>
-          </span>
+        <Link href="/" aria-label="BrainBox Ecom Lab, home" onClick={() => setOpen(false)}>
+          <Wordmark />
         </Link>
 
-        <ul className="hidden items-center gap-8 md:flex">
-          {links.map((l) => (
+        <ul className="hidden items-center gap-10 md:flex">
+          {links.map((l, i) => (
             <li key={l.href}>
               <a
                 href={l.href}
-                className="inline-flex h-11 items-center text-sm text-text-muted transition-colors hover:text-text"
+                className="relative inline-flex h-11 items-center text-[14px] text-ink/80 transition-colors hover:text-ink"
               >
+                {i === 0 && (
+                  <span aria-hidden="true" className="absolute -left-3 h-1.5 w-1.5 rounded-full bg-tape" />
+                )}
                 {l.label}
               </a>
             </li>
@@ -103,35 +114,31 @@ export default function Nav() {
             aria-controls="mobile-menu"
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((v) => !v)}
-            className="flex h-11 w-11 items-center justify-center border border-border text-text md:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-line md:hidden"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </nav>
 
-      <div
-        id="mobile-menu"
-        hidden={!open}
-        className="border-t border-border bg-black md:hidden"
-      >
-        <ul className="px-5 py-3">
+      <div id="mobile-menu" hidden={!open} className="border-t border-line bg-paper md:hidden">
+        <ul className="px-5 py-2">
           {links.map((l) => (
             <li key={l.href}>
               <a
                 href={l.href}
                 onClick={(e) => goToSection(e, l.href)}
-                className="flex h-14 items-center justify-between border-b border-border font-display text-xl font-bold"
+                className="flex h-16 items-center justify-between border-b border-line font-serif text-[32px] leading-none"
               >
                 {l.label}
-                <span aria-hidden="true" className="text-accent-light">
+                <span aria-hidden="true" className="font-sans text-base text-forest">
                   →
                 </span>
               </a>
             </li>
           ))}
         </ul>
-        <div className="px-5 pb-6 pt-2">
+        <div className="px-5 pb-6 pt-3">
           <ApplyButton placement="nav_mobile" size="lg" className="w-full" />
         </div>
       </div>

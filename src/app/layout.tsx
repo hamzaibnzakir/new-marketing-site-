@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { Syne, DM_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Instrument_Serif, DM_Sans, IBM_Plex_Mono } from "next/font/google";
 import Script from "next/script";
 import ScrollRefresh from "@/components/ScrollRefresh";
 import "./globals.css";
 
-const syne = Syne({
-  variable: "--font-syne",
+const serif = Instrument_Serif({
+  variable: "--font-instrument",
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
+  weight: "400",
+  style: ["normal", "italic"],
 });
 
 const dmSans = DM_Sans({
@@ -78,9 +79,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${dmSans.variable} ${plexMono.variable} h-full antialiased`}
+      className={`${serif.variable} ${dmSans.variable} ${plexMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-black text-white">
+      <body className="min-h-full flex flex-col bg-paper text-ink">
         {/* Structured data — helps AI answer engines (GEO/AEO) and
             search engines understand who/what this site is without
             having to infer it from prose. */}

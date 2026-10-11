@@ -51,7 +51,7 @@ const paths = [
 export default function OtherPaths() {
   return (
     <section
-      className="border-t border-border bg-surface py-24 md:py-32"
+      className="bg-paper-2 py-24 md:py-32"
       aria-labelledby="paths-title"
     >
       <Container>
@@ -59,30 +59,30 @@ export default function OtherPaths() {
           <Eyebrow>Not ready for full mentorship?</Eyebrow>
           <h2
             id="paths-title"
-            className="display-lg mt-5 max-w-2xl text-[clamp(1.9rem,1rem+2.4vw,3rem)]"
+            className="serif mt-6 max-w-2xl text-[clamp(2.8rem,1.4rem+3.6vw,4.8rem)]"
           >
-            Two smaller ways to start.
+            Two smaller <em>ways to start.</em>
           </h2>
         </Reveal>
 
         <div className="mt-12 grid gap-4 md:grid-cols-2">
           {paths.map((p, i) => (
             <Reveal key={p.title} delay={i * 0.08} className="h-full">
-              <article className="flex h-full flex-col border border-border bg-black p-7 md:p-9">
-                <p className="font-mono text-[12px] uppercase tracking-[0.12em] text-accent-light">
+              <article className="flex h-full flex-col rounded-[22px] bg-paper-3 p-7 md:p-9">
+                <p className="font-mono text-[12px] uppercase tracking-[0.12em] text-forest">
                   {p.kicker}
                 </p>
-                <h3 className="mt-3 font-display text-2xl font-bold tracking-tight">
+                <h3 className="serif mt-3 text-[2.6rem] leading-none">
                   {p.title}
                 </h3>
-                <p className="mt-3 max-w-md text-[15px] leading-relaxed text-text-muted">
+                <p className="mt-3 max-w-md text-[15px] leading-relaxed text-muted">
                   {p.body}
                 </p>
                 <ul className="mt-6 flex flex-wrap gap-2">
                   {p.items.map((it) => (
                     <li
                       key={it}
-                      className="border border-border px-3 py-1.5 text-[13px] text-text-muted"
+                      className="rounded-full border border-line px-3 py-1.5 text-[13px] text-muted"
                     >
                       {it}
                     </li>
@@ -94,7 +94,7 @@ export default function OtherPaths() {
                   target="_blank"
                   rel="noreferrer"
                   data-bb-placement={p.placement}
-                  className="group mt-8 inline-flex h-12 w-fit items-center gap-2 border border-white/25 px-5 font-display text-sm font-bold transition-colors hover:border-accent-light hover:text-accent-light"
+                  className="group mt-8 inline-flex h-12 w-fit items-center gap-2 rounded-full border border-ink px-5 text-[15px] font-medium transition-colors hover:bg-ink hover:text-on-dark"
                 >
                   {p.cta}
                   <ArrowUpRight

@@ -47,7 +47,7 @@ export default function FAQSection() {
   return (
     <section
       id="faq"
-      className="border-t border-border py-24 md:py-36"
+      className="bg-paper py-24 md:py-36"
       aria-labelledby="faq-title"
     >
       {/* Structured data so search and AI answer engines can surface these Q&As. */}
@@ -63,18 +63,18 @@ export default function FAQSection() {
                 <Eyebrow>FAQ</Eyebrow>
                 <h2
                   id="faq-title"
-                  className="display-xl mt-5 text-[clamp(2.2rem,1rem+3.2vw,3.6rem)]"
+                  className="serif mt-6 text-[clamp(3rem,1.4rem+4vw,5.4rem)]"
                 >
-                  Before you apply.
+                  Before you <em>apply.</em>
                 </h2>
-                <p className="mt-5 max-w-sm text-[16px] leading-relaxed text-text-muted">
+                <p className="mt-5 max-w-sm text-[16px] leading-relaxed text-muted">
                   Anything else, ask us in the application. Every one gets a
                   real reply.
                 </p>
               </Reveal>
             </div>
           </div>
-          <div className="divide-y divide-border border-y border-border lg:col-span-8">
+          <div className="divide-y divide-line border-y border-line lg:col-span-8">
             {faqs.map((f) => (
               <FAQItem key={f.q} q={f.q} a={f.a} />
             ))}

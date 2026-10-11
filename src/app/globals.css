@@ -1,79 +1,72 @@
 @import "tailwindcss";
 
 /*
-  Design tokens: the single source of truth for the design system.
+  BrainBox design system (v2, editorial).
 
-  Palette
-  - Ink (near-black) is the base surface.
-  - Bone is the light "paper" surface used for proof and the closing CTA,
-    so real dashboard screenshots (mostly white UIs) sit on a calm,
-    warm background instead of glowing out of a black page.
-  - Emerald (LOCKED) is the primary brand accent: highlights, data, icons.
-  - Crimson (LOCKED) is reserved for the Apply CTA and the packing tape
-    on the hero box. Nothing else uses it, so the CTA always stands out.
+  Direction: a light, editorial page built around a real 3D render (the
+  BrainBox box wrapped in emerald packing tape), big serif headlines with
+  an italic accent word, pill CTAs, and a few dark "stage" sections for
+  contrast (the glowing 3D logo, the footer).
+
+  Colour
+  - paper / paper-2: warm light greys, the main surfaces.
+  - ink: near-black text and the dark stage sections.
+  - tape (emerald #21c47f): the brand accent. Primary CTA pill, tape,
+    highlights. Ink text on tape passes AA.
+  - forest (#0a6b45): emerald dark enough for text/links on paper.
 
   Type
-  - Syne (display): oversized editorial headlines, tight leading.
-  - DM Sans (body).
-  - IBM Plex Mono (labels, data, packing-slip details).
+  - Instrument Serif: display. Italic for the one emphasised word.
+  - DM Sans: body. IBM Plex Mono: labels and data.
 
-  Spacing scale: Tailwind's 4px scale. Sections use py-24 (mobile) and
-  py-36 (desktop). Container: 1240px max, 20px gutter mobile, 32px desktop.
-  Radii: sharp by default (editorial), 6px for floating data cards only.
+  Radius: pills (999px) for actions, 18px for cards, 10px for screenshots.
+  Motion: one easing (--ease-out), entrance 0.8–1.1s, nothing loops fast,
+  everything disabled under prefers-reduced-motion.
 */
 :root {
-  --black: #050505;
-  --surface: #0d0d0d;
-  --surface-2: #141414;
-  --text: #f0ede6;
-  --text-muted: #9a978f;
-  --border: rgba(255, 255, 255, 0.09);
+  --paper: #e6e4e0;
+  --paper-2: #dcd9d3;
+  --paper-3: #f3f1ed;
+  --ink: #0b0b0b;
+  --ink-2: #161616;
+  --muted: #5e5a53;
+  --line: rgba(11, 11, 11, 0.12);
 
-  --bone: #ece7dc;
-  --bone-2: #e2dccd;
-  --bone-ink: #121212;
-  --bone-muted: #5a564e;
-  --bone-border: rgba(18, 18, 18, 0.14);
+  --tape: #21c47f;
+  --tape-2: #2bd690;
+  --forest: #0a6b45;
 
-  /* LOCKED primary accent: emerald */
-  --accent: #0f5c3f;
-  --accent-light: #2ecc8f;
-  --accent-dim: #0a3d2a;
-
-  /* LOCKED secondary accent: crimson. Apply CTA + packing tape only. */
-  --accent-2: #8c1d2e;
-  --accent-2-light: #d63a4f;
+  --on-dark: #f0ede6;
+  --on-dark-muted: #9a978f;
+  --line-dark: rgba(255, 255, 255, 0.1);
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @theme inline {
-  --color-black: var(--black);
-  --color-surface: var(--surface);
-  --color-surface-2: var(--surface-2);
-  --color-text: var(--text);
-  --color-text-muted: var(--text-muted);
-  --color-border: var(--border);
-  --color-bone: var(--bone);
-  --color-bone-2: var(--bone-2);
-  --color-bone-ink: var(--bone-ink);
-  --color-bone-muted: var(--bone-muted);
-  --color-bone-border: var(--bone-border);
-  --color-accent: var(--accent);
-  --color-accent-light: var(--accent-light);
-  --color-accent-dim: var(--accent-dim);
-  --color-accent-2: var(--accent-2);
-  --color-accent-2-light: var(--accent-2-light);
-  --font-display: var(--font-syne);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-paper-3: var(--paper-3);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-tape: var(--tape);
+  --color-tape-2: var(--tape-2);
+  --color-forest: var(--forest);
+  --color-on-dark: var(--on-dark);
+  --color-on-dark-muted: var(--on-dark-muted);
+  --color-line-dark: var(--line-dark);
+
+  --font-serif: var(--font-instrument);
   --font-body: var(--font-dm-sans);
   --font-mono: var(--font-plex-mono);
 }
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 88px;
+  scroll-padding-top: 84px;
 }
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -81,63 +74,48 @@ html {
 }
 
 body {
-  background: var(--black);
-  color: var(--text);
+  background: var(--paper);
+  color: var(--ink);
   font-family: var(--font-dm-sans), sans-serif;
-  font-weight: 400;
-  line-height: 1.65;
+  line-height: 1.6;
   overflow-x: hidden;
 }
 
 ::selection {
-  background: var(--accent-light);
-  color: var(--black);
+  background: var(--tape);
+  color: var(--ink);
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent-light);
+  outline: 2px solid var(--forest);
   outline-offset: 3px;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
+.serif {
+  font-family: var(--font-instrument), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.92;
 }
-::-webkit-scrollbar-track {
-  background: var(--black);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--accent-dim);
-  border-radius: 3px;
-}
-
-/* Oversized editorial display type */
-.display-xl {
-  font-family: var(--font-syne), sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 0.95;
-}
-.display-lg {
-  font-family: var(--font-syne), sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.02;
+.serif em,
+.serif i {
+  font-style: italic;
 }
 
-/* Legal page content, styled to match the design system */
+/* Legal page content */
 .legal-content h2 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.25rem;
+  font-family: var(--font-instrument), Georgia, serif;
+  font-size: 1.75rem;
   margin-top: 2.5rem;
   margin-bottom: 0.75rem;
-  color: var(--text);
+  color: var(--ink);
 }
 .legal-content h2:first-child {
   margin-top: 0;
 }
-.legal-content p {
-  color: var(--text-muted);
+.legal-content p,
+.legal-content ul {
+  color: var(--muted);
   font-size: 0.9375rem;
   line-height: 1.75;
   margin-bottom: 1rem;
@@ -145,29 +123,23 @@ body {
 .legal-content ul {
   list-style: disc;
   padding-left: 1.25rem;
-  color: var(--text-muted);
-  font-size: 0.9375rem;
-  line-height: 1.75;
-  margin-bottom: 1rem;
 }
 .legal-content li {
   margin-bottom: 0.4rem;
 }
 .legal-content strong {
-  color: var(--text);
+  color: var(--ink);
   font-weight: 600;
 }
 .legal-content a {
-  color: var(--accent-light);
+  color: var(--forest);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 /* ------------------------------------------------------------------
-   Scroll reveal. The hidden starting state lives in CSS so there's no
-   flash of content before the animation. Only applies with JS on and
-   motion allowed; otherwise content is simply visible. Reveal.tsx
-   animates it in, then marks it data-reveal="done".
+   Scroll reveal: hidden state in CSS (no flash), only with JS on and
+   motion allowed. Reveal.tsx animates in and marks data-reveal="done".
 ------------------------------------------------------------------- */
 @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
   [data-reveal]:not([data-reveal="done"]) {
@@ -176,176 +148,111 @@ body {
   }
 }
 
-/* ------------------------------------------------------------------
-   Hero entrance. Pure CSS so it plays on first paint, before hydration,
-   and the content is fully visible with JS off or reduced motion.
-------------------------------------------------------------------- */
+/* Hero entrance, CSS-only so it plays on first paint */
 @keyframes rise-in {
   from {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(32px);
   }
   to {
     opacity: 1;
     transform: none;
   }
 }
-
-@keyframes box-in {
+@keyframes render-in {
   from {
     opacity: 0;
-    transform: translateY(48px) scale(0.96);
+    transform: translateY(60px) scale(0.92);
   }
   to {
     opacity: 1;
     transform: none;
   }
 }
-
-/* Cards come up out of the box: the "unboxing" beat */
-@keyframes unbox {
+@keyframes card-in {
   from {
     opacity: 0;
-    transform: translateY(55%);
+    transform: translate3d(0, 40px, 0) scale(0.9);
   }
   to {
     opacity: 1;
     transform: none;
   }
 }
-
-@keyframes float-a {
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes bob {
   0%,
   100% {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-3.5%);
+    transform: translateY(-10px);
   }
 }
-
-@keyframes glow-breathe {
-  0%,
-  100% {
-    opacity: 0.75;
-  }
-  50% {
-    opacity: 1;
+@keyframes tape-scroll {
+  to {
+    transform: translateX(-50%);
   }
 }
 
 .hero-in {
-  animation: rise-in 0.8s var(--ease-out) both;
+  animation: rise-in 0.9s var(--ease-out) both;
   animation-delay: calc(var(--d, 0) * 1ms);
 }
-
-.box-in {
-  animation: box-in 1.1s var(--ease-out) 0.15s both;
+.render-in {
+  animation: render-in 1.2s var(--ease-out) 0.1s both;
 }
-
-.card-unbox {
-  animation: unbox 0.9s var(--ease-out) both;
+.card-in {
+  animation: card-in 1s var(--ease-out) both;
   animation-delay: calc(var(--d, 0) * 1ms);
 }
-
-.card-float {
-  animation: float-a var(--dur, 7s) ease-in-out infinite;
-  animation-delay: var(--fd, 0s);
+.badge-spin {
+  animation: spin 18s linear infinite;
 }
-
-.box-glow {
-  animation: glow-breathe 5s ease-in-out infinite;
+.bob {
+  animation: bob 6s ease-in-out infinite;
+}
+.tape-run {
+  animation: tape-scroll var(--tape-dur, 40s) linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-in,
-  .box-in,
-  .card-unbox,
-  .card-float,
-  .box-glow {
+  .render-in,
+  .card-in,
+  .badge-spin,
+  .bob,
+  .tape-run {
     animation: none;
   }
 }
 
-/* ------------------------------------------------------------------
-   Hero box. Fixed aspect ratio so the SVG box and the HTML data cards
-   share one coordinate system at every width. Card type scales with the
-   container (cqw) and is clamped so it stays legible on phones.
-------------------------------------------------------------------- */
-.hero-box {
-  position: relative;
-  aspect-ratio: 640 / 600;
-  container-type: inline-size;
-}
-
-.hero-box > svg,
-.hero-box > .hero-box-layer {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.data-card {
-  position: absolute;
-  border-radius: 6px;
-  background: #fbfaf7;
-  color: #111;
+/* Packing tape strip (footer, process) */
+.tape {
+  background: var(--tape);
+  color: var(--ink);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.6) inset,
-    0 18px 40px -12px rgba(0, 0, 0, 0.7),
-    0 4px 12px rgba(0, 0, 0, 0.35);
-  padding: 7% 8%;
-  overflow: hidden;
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+    0 10px 30px -10px rgba(0, 0, 0, 0.5);
 }
 
-.data-card .dc-label {
-  font-family: var(--font-plex-mono), monospace;
-  font-size: clamp(8px, 1.65cqw, 12px);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #6b675f;
-  line-height: 1.3;
-}
-
-.data-card .dc-value {
-  font-family: var(--font-syne), sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  margin-top: 0.4em;
-  color: #0b0b0b;
-}
-
-.data-card .dc-sub {
-  font-size: clamp(8px, 1.6cqw, 12px);
-  color: #0f5c3f;
-  font-weight: 500;
-  margin-top: 0.45em;
-  line-height: 1.3;
-}
-
-@container (max-width: 420px) {
-  .data-card .dc-sub {
-    display: none;
-  }
-}
-
-/* Thin scrollbar for the horizontal proof strip */
+/* Horizontal strips */
 .snap-strip {
   scrollbar-width: thin;
-  scrollbar-color: var(--bone-muted) transparent;
+  scrollbar-color: var(--muted) transparent;
 }
 .snap-strip::-webkit-scrollbar {
   height: 4px;
 }
 .snap-strip::-webkit-scrollbar-thumb {
-  background: var(--bone-muted);
-}
-.snap-strip::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--muted);
 }
 
 dialog.lightbox::backdrop {
-  background: rgba(5, 5, 5, 0.86);
+  background: rgba(5, 5, 5, 0.88);
 }
